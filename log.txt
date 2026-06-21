@@ -1,0 +1,519 @@
+﻿2026-06-21T15:50:10.9636677Z Current runner version: '2.335.1'
+2026-06-21T15:50:10.9671050Z ##[group]Runner Image Provisioner
+2026-06-21T15:50:10.9672477Z Hosted Compute Agent
+2026-06-21T15:50:10.9673492Z Version: 20260611.554
+2026-06-21T15:50:10.9674515Z Commit: 5e0782fdc9014723d3be820dd114dd31555c2bd1
+2026-06-21T15:50:10.9676082Z Build Date: 2026-06-11T21:40:46Z
+2026-06-21T15:50:10.9677187Z Worker ID: {5f1c52ea-6582-470c-b7b2-61a4fa1fc082}
+2026-06-21T15:50:10.9678360Z Azure Region: eastus
+2026-06-21T15:50:10.9679375Z ##[endgroup]
+2026-06-21T15:50:10.9682016Z ##[group]Operating System
+2026-06-21T15:50:10.9683392Z Ubuntu
+2026-06-21T15:50:10.9684216Z 24.04.4
+2026-06-21T15:50:10.9684931Z LTS
+2026-06-21T15:50:10.9685836Z ##[endgroup]
+2026-06-21T15:50:10.9686842Z ##[group]Runner Image
+2026-06-21T15:50:10.9687866Z Image: ubuntu-24.04
+2026-06-21T15:50:10.9688748Z Version: 20260615.205.1
+2026-06-21T15:50:10.9690811Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260615.205/images/ubuntu/Ubuntu2404-Readme.md
+2026-06-21T15:50:10.9693287Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260615.205
+2026-06-21T15:50:10.9695023Z ##[endgroup]
+2026-06-21T15:50:10.9697098Z ##[group]GITHUB_TOKEN Permissions
+2026-06-21T15:50:10.9700375Z Contents: read
+2026-06-21T15:50:10.9701314Z Metadata: read
+2026-06-21T15:50:10.9702198Z Packages: read
+2026-06-21T15:50:10.9703145Z ##[endgroup]
+2026-06-21T15:50:10.9706609Z Secret source: Actions
+2026-06-21T15:50:10.9707900Z Prepare workflow directory
+2026-06-21T15:50:11.0160216Z Prepare all required actions
+2026-06-21T15:50:11.0213089Z Getting action download info
+2026-06-21T15:50:11.2413430Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-06-21T15:50:11.3099905Z Download action repository 'actions/setup-java@v4' (SHA:c1e323688fd81a25caa38c78aa6df2d33d3e20d9)
+2026-06-21T15:50:11.5419665Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-06-21T15:50:11.7614163Z Complete job name: Build APK
+2026-06-21T15:50:11.8348893Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-21T15:50:11.8358378Z ##[group]Run actions/checkout@v4
+2026-06-21T15:50:11.8359082Z with:
+2026-06-21T15:50:11.8359548Z   repository: suhaimitoamy/amy-elite-suite
+2026-06-21T15:50:11.8364094Z   token: ***
+2026-06-21T15:50:11.8364526Z   ssh-strict: true
+2026-06-21T15:50:11.8364971Z   ssh-user: git
+2026-06-21T15:50:11.8365418Z   persist-credentials: true
+2026-06-21T15:50:11.8366139Z   clean: true
+2026-06-21T15:50:11.8366586Z   sparse-checkout-cone-mode: true
+2026-06-21T15:50:11.8367098Z   fetch-depth: 1
+2026-06-21T15:50:11.8367528Z   fetch-tags: false
+2026-06-21T15:50:11.8367964Z   show-progress: true
+2026-06-21T15:50:11.8368427Z   lfs: false
+2026-06-21T15:50:11.8368881Z   submodules: false
+2026-06-21T15:50:11.8369330Z   set-safe-directory: true
+2026-06-21T15:50:11.8370050Z ##[endgroup]
+2026-06-21T15:50:11.9403821Z Syncing repository: suhaimitoamy/amy-elite-suite
+2026-06-21T15:50:11.9406434Z ##[group]Getting Git version info
+2026-06-21T15:50:11.9407418Z Working directory is '/home/runner/work/amy-elite-suite/amy-elite-suite'
+2026-06-21T15:50:11.9408810Z [command]/usr/bin/git version
+2026-06-21T15:50:11.9424253Z git version 2.54.0
+2026-06-21T15:50:11.9445422Z ##[endgroup]
+2026-06-21T15:50:11.9460654Z Temporarily overriding HOME='/home/runner/work/_temp/5f28fafd-7720-42cb-a961-2702121a449c' before making global git config changes
+2026-06-21T15:50:11.9462062Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-21T15:50:11.9466477Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/amy-elite-suite/amy-elite-suite
+2026-06-21T15:50:11.9518986Z Deleting the contents of '/home/runner/work/amy-elite-suite/amy-elite-suite'
+2026-06-21T15:50:11.9524956Z ##[group]Initializing the repository
+2026-06-21T15:50:11.9530432Z [command]/usr/bin/git init /home/runner/work/amy-elite-suite/amy-elite-suite
+2026-06-21T15:50:11.9607031Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-06-21T15:50:11.9608972Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-06-21T15:50:11.9611892Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-06-21T15:50:11.9613338Z hint: call:
+2026-06-21T15:50:11.9614184Z hint:
+2026-06-21T15:50:11.9615181Z hint: 	git config --global init.defaultBranch <name>
+2026-06-21T15:50:11.9616643Z hint:
+2026-06-21T15:50:11.9617804Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-06-21T15:50:11.9619569Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-06-21T15:50:11.9621938Z hint:
+2026-06-21T15:50:11.9622795Z hint: 	git branch -m <name>
+2026-06-21T15:50:11.9623771Z hint:
+2026-06-21T15:50:11.9624876Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-06-21T15:50:11.9627479Z Initialized empty Git repository in /home/runner/work/amy-elite-suite/amy-elite-suite/.git/
+2026-06-21T15:50:11.9630885Z [command]/usr/bin/git remote add origin https://github.com/suhaimitoamy/amy-elite-suite
+2026-06-21T15:50:11.9698167Z ##[endgroup]
+2026-06-21T15:50:11.9699376Z ##[group]Disabling automatic garbage collection
+2026-06-21T15:50:11.9703455Z [command]/usr/bin/git config --local gc.auto 0
+2026-06-21T15:50:11.9738153Z ##[endgroup]
+2026-06-21T15:50:11.9739278Z ##[group]Setting up auth
+2026-06-21T15:50:11.9746109Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-21T15:50:11.9783413Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-21T15:50:12.0122819Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-21T15:50:12.0156979Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-21T15:50:12.0408081Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-21T15:50:12.0435725Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-21T15:50:12.0681967Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-06-21T15:50:12.0718830Z ##[endgroup]
+2026-06-21T15:50:12.0727476Z ##[group]Fetching the repository
+2026-06-21T15:50:12.0728896Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8b087b61c45cb698fda35e36c7ca70ed5b892b01:refs/remotes/origin/main
+2026-06-21T15:50:12.2451531Z From https://github.com/suhaimitoamy/amy-elite-suite
+2026-06-21T15:50:12.2452960Z  * [new ref]         8b087b61c45cb698fda35e36c7ca70ed5b892b01 -> origin/main
+2026-06-21T15:50:12.2483856Z ##[endgroup]
+2026-06-21T15:50:12.2484949Z ##[group]Determining the checkout info
+2026-06-21T15:50:12.2486874Z ##[endgroup]
+2026-06-21T15:50:12.2492783Z [command]/usr/bin/git sparse-checkout disable
+2026-06-21T15:50:12.2538487Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-06-21T15:50:12.2567148Z ##[group]Checking out the ref
+2026-06-21T15:50:12.2571696Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-06-21T15:50:12.2633163Z Switched to a new branch 'main'
+2026-06-21T15:50:12.2636097Z branch 'main' set up to track 'origin/main'.
+2026-06-21T15:50:12.2642077Z ##[endgroup]
+2026-06-21T15:50:12.2680837Z [command]/usr/bin/git log -1 --format=%H
+2026-06-21T15:50:12.2704543Z 8b087b61c45cb698fda35e36c7ca70ed5b892b01
+2026-06-21T15:50:12.3070937Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-21T15:50:12.3074089Z ##[group]Run actions/setup-java@v4
+2026-06-21T15:50:12.3074606Z with:
+2026-06-21T15:50:12.3075011Z   distribution: temurin
+2026-06-21T15:50:12.3075463Z   java-version: 17
+2026-06-21T15:50:12.3076057Z   java-package: jdk
+2026-06-21T15:50:12.3076495Z   check-latest: false
+2026-06-21T15:50:12.3076929Z   server-id: github
+2026-06-21T15:50:12.3077364Z   server-username: GITHUB_ACTOR
+2026-06-21T15:50:12.3077899Z   server-password: GITHUB_TOKEN
+2026-06-21T15:50:12.3078376Z   overwrite-settings: true
+2026-06-21T15:50:12.3078833Z   job-status: success
+2026-06-21T15:50:12.3083217Z   token: ***
+2026-06-21T15:50:12.3083646Z ##[endgroup]
+2026-06-21T15:50:12.4734068Z ##[group]Installed distributions
+2026-06-21T15:50:12.4803456Z Resolved Java 17.0.19+10 from tool-cache
+2026-06-21T15:50:12.4804539Z Setting Java 17.0.19+10 as the default
+2026-06-21T15:50:12.4816208Z (node:2281) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-21T15:50:12.4818411Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-21T15:50:12.4823395Z Creating toolchains.xml for JDK version 17 from temurin
+2026-06-21T15:50:12.4894386Z Writing to /home/runner/.m2/toolchains.xml
+2026-06-21T15:50:12.4895723Z 
+2026-06-21T15:50:12.4896685Z Java configuration:
+2026-06-21T15:50:12.4897580Z   Distribution: temurin
+2026-06-21T15:50:12.4898448Z   Version: 17.0.19+10
+2026-06-21T15:50:12.4899540Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-06-21T15:50:12.4900611Z 
+2026-06-21T15:50:12.4901582Z ##[endgroup]
+2026-06-21T15:50:12.4919541Z Creating settings.xml with server-id: github
+2026-06-21T15:50:12.4921003Z Writing to /home/runner/.m2/settings.xml
+2026-06-21T15:50:12.5071858Z ##[group]Run chmod +x gradlew
+2026-06-21T15:50:12.5072715Z [36;1mchmod +x gradlew[0m
+2026-06-21T15:50:12.5217159Z shell: /usr/bin/bash -e {0}
+2026-06-21T15:50:12.5217874Z env:
+2026-06-21T15:50:12.5218779Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-06-21T15:50:12.5220513Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-06-21T15:50:12.5221776Z ##[endgroup]
+2026-06-21T15:50:12.5379454Z ##[group]Run ./gradlew assembleDebug --no-configuration-cache --stacktrace
+2026-06-21T15:50:12.5381161Z [36;1m./gradlew assembleDebug --no-configuration-cache --stacktrace[0m
+2026-06-21T15:50:12.5416463Z shell: /usr/bin/bash -e {0}
+2026-06-21T15:50:12.5417107Z env:
+2026-06-21T15:50:12.5417949Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-06-21T15:50:12.5419546Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-06-21T15:50:12.5420800Z ##[endgroup]
+2026-06-21T15:50:12.7022562Z Fetching distribution.
+2026-06-21T15:50:12.7024179Z Downloading https://services.gradle.org/distributions/gradle-8.4-bin.zip
+2026-06-21T15:50:14.2068648Z ............10%............20%.............30%............40%.............50%............60%.............70%............80%.............90%............100%
+2026-06-21T15:50:15.3533303Z 
+2026-06-21T15:50:15.3536145Z Welcome to Gradle 8.4!
+2026-06-21T15:50:15.3544633Z 
+2026-06-21T15:50:15.3545038Z Here are the highlights of this release:
+2026-06-21T15:50:15.3545700Z  - Compiling and testing with Java 21
+2026-06-21T15:50:15.3556727Z  - Faster Java compilation on Windows
+2026-06-21T15:50:15.3557373Z  - Role focused dependency configurations creation
+2026-06-21T15:50:15.3557825Z 
+2026-06-21T15:50:15.3558407Z For more details see https://docs.gradle.org/8.4/release-notes.html
+2026-06-21T15:50:15.3558936Z 
+2026-06-21T15:50:15.4526415Z Starting a Gradle Daemon (subsequent builds will be faster)
+2026-06-21T15:51:12.0575756Z > Task :app:preBuild UP-TO-DATE
+2026-06-21T15:51:12.0596637Z > Task :app:preDebugBuild UP-TO-DATE
+2026-06-21T15:51:12.0682092Z > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+2026-06-21T15:51:14.6528965Z > Task :app:checkDebugAarMetadata FAILED
+2026-06-21T15:51:14.6537257Z 
+2026-06-21T15:51:14.6537761Z FAILURE: Build failed with an exception.
+2026-06-21T15:51:14.6538332Z 
+2026-06-21T15:51:14.6538675Z * What went wrong:
+2026-06-21T15:51:14.6539430Z Execution failed for task ':app:checkDebugAarMetadata'.
+2026-06-21T15:51:14.6540973Z > Configuration `:app:debugRuntimeClasspath` contains AndroidX dependencies, but the `android.useAndroidX` property is not enabled, which may cause runtime issues.
+2026-06-21T15:51:14.6542569Z   Set `android.useAndroidX=true` in the `gradle.properties` file and retry.
+2026-06-21T15:51:14.6543495Z   The following AndroidX dependencies are detected:
+2026-06-21T15:51:14.6544369Z   :app:debugRuntimeClasspath -> androidx.core:core-ktx:1.12.0
+2026-06-21T15:51:14.6545717Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.annotation:annotation:1.6.0
+2026-06-21T15:51:14.6547864Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.annotation:annotation:1.6.0 -> androidx.annotation:annotation-jvm:1.6.0
+2026-06-21T15:51:14.6549678Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.core:core:1.12.0
+2026-06-21T15:51:14.6551250Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.annotation:annotation-experimental:1.3.0
+2026-06-21T15:51:14.6553282Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1 -> androidx.collection:collection:1.1.0
+2026-06-21T15:51:14.6555551Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.core:core:1.12.0 -> androidx.concurrent:concurrent-futures:1.1.0
+2026-06-21T15:51:14.6558157Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1 -> androidx.vectordrawable:vectordrawable-animated:1.1.0 -> androidx.interpolator:interpolator:1.0.0
+2026-06-21T15:51:14.6560457Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.lifecycle:lifecycle-runtime:2.6.1
+2026-06-21T15:51:14.6562749Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.savedstate:savedstate:1.2.1 -> androidx.arch.core:core-common:2.2.0
+2026-06-21T15:51:14.6565149Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.lifecycle:lifecycle-livedata-core:2.6.1 -> androidx.arch.core:core-runtime:2.2.0
+2026-06-21T15:51:14.6567725Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.savedstate:savedstate:1.2.1 -> androidx.lifecycle:lifecycle-common:2.6.1
+2026-06-21T15:51:14.6569987Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.loader:loader:1.0.0 -> androidx.lifecycle:lifecycle-livedata:2.6.1
+2026-06-21T15:51:14.6572258Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.lifecycle:lifecycle-livedata-core:2.6.1
+2026-06-21T15:51:14.6574315Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2:1.2.0 -> androidx.lifecycle:lifecycle-process:2.6.1
+2026-06-21T15:51:14.6576373Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2:1.2.0 -> androidx.startup:startup-runtime:1.1.1
+2026-06-21T15:51:14.6578257Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.activity:activity:1.8.0 -> androidx.tracing:tracing:1.0.0
+2026-06-21T15:51:14.6580049Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.lifecycle:lifecycle-viewmodel:2.6.1
+2026-06-21T15:51:14.6582352Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1
+2026-06-21T15:51:14.6584258Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.savedstate:savedstate:1.2.1
+2026-06-21T15:51:14.6586207Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.activity:activity:1.8.0 -> androidx.profileinstaller:profileinstaller:1.3.0
+2026-06-21T15:51:14.6588363Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.core:core:1.12.0 -> androidx.versionedparcelable:versionedparcelable:1.1.1
+2026-06-21T15:51:14.6589942Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1
+2026-06-21T15:51:14.6591278Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.activity:activity:1.8.0
+2026-06-21T15:51:14.6592897Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1
+2026-06-21T15:51:14.6594660Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.vectordrawable:vectordrawable:1.1.0
+2026-06-21T15:51:14.6596976Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1 -> androidx.vectordrawable:vectordrawable-animated:1.1.0
+2026-06-21T15:51:14.6598998Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.cursoradapter:cursoradapter:1.0.0
+2026-06-21T15:51:14.6600670Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.drawerlayout:drawerlayout:1.1.1
+2026-06-21T15:51:14.6602633Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.drawerlayout:drawerlayout:1.1.1 -> androidx.customview:customview:1.1.0
+2026-06-21T15:51:14.6604450Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2:1.2.0
+2026-06-21T15:51:14.6606124Z   :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2-views-helper:1.2.0
+2026-06-21T15:51:14.6607753Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6
+2026-06-21T15:51:14.6609573Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.viewpager:viewpager:1.0.0
+2026-06-21T15:51:14.6611839Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.loader:loader:1.0.0
+2026-06-21T15:51:14.6613950Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.resourceinspection:resourceinspection-annotation:1.0.1
+2026-06-21T15:51:14.6615479Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0
+2026-06-21T15:51:14.6617080Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.cardview:cardview:1.0.0
+2026-06-21T15:51:14.6618864Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.coordinatorlayout:coordinatorlayout:1.1.0
+2026-06-21T15:51:14.6620707Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.constraintlayout:constraintlayout:2.0.1
+2026-06-21T15:51:14.6622937Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.constraintlayout:constraintlayout:2.0.1 -> androidx.constraintlayout:constraintlayout-solver:2.0.1
+2026-06-21T15:51:14.6625093Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0
+2026-06-21T15:51:14.6627420Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0
+2026-06-21T15:51:14.6630182Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0 -> androidx.documentfile:documentfile:1.0.0
+2026-06-21T15:51:14.6633657Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0 -> androidx.localbroadcastmanager:localbroadcastmanager:1.0.0
+2026-06-21T15:51:14.6637111Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0 -> androidx.print:print:1.0.0
+2026-06-21T15:51:14.6639417Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.recyclerview:recyclerview:1.1.0
+2026-06-21T15:51:14.6641092Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.transition:transition:1.2.0
+2026-06-21T15:51:14.6642789Z   :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.viewpager2:viewpager2:1.0.0
+2026-06-21T15:51:14.6643754Z 
+2026-06-21T15:51:14.6644056Z * Try:
+2026-06-21T15:51:14.6644704Z > Run with --info or --debug option to get more log output.
+2026-06-21T15:51:14.6645495Z > Run with --scan to get full insights.
+2026-06-21T15:51:14.6646380Z > Get more help at https://help.gradle.org.
+2026-06-21T15:51:14.6654866Z 
+2026-06-21T15:51:14.6655283Z * Exception is:
+2026-06-21T15:51:14.6656701Z org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:checkDebugAarMetadata'.
+2026-06-21T15:51:14.6658491Z 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:38)
+2026-06-21T15:51:14.6660296Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+2026-06-21T15:51:14.6662001Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+2026-06-21T15:51:14.6663742Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+2026-06-21T15:51:14.6666058Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+2026-06-21T15:51:14.6668292Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+2026-06-21T15:51:14.6670498Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+2026-06-21T15:51:14.6673358Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.6680228Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+2026-06-21T15:51:14.6682097Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.6683831Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+2026-06-21T15:51:14.6685531Z 	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+2026-06-21T15:51:14.6687685Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+2026-06-21T15:51:14.6689333Z 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+2026-06-21T15:51:14.6691117Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+2026-06-21T15:51:14.6693168Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+2026-06-21T15:51:14.6695352Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+2026-06-21T15:51:14.6697755Z 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+2026-06-21T15:51:14.6699685Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+2026-06-21T15:51:14.6701856Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+2026-06-21T15:51:14.6703740Z 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
+2026-06-21T15:51:14.6705245Z 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+2026-06-21T15:51:14.6706864Z 	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+2026-06-21T15:51:14.6736523Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+2026-06-21T15:51:14.6767301Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+2026-06-21T15:51:14.6797184Z 	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+2026-06-21T15:51:14.6798873Z 	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+2026-06-21T15:51:14.6802937Z 	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+2026-06-21T15:51:14.6805166Z 	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+2026-06-21T15:51:14.6807567Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+2026-06-21T15:51:14.6809750Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+2026-06-21T15:51:14.6811724Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+2026-06-21T15:51:14.6813604Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.6815407Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+2026-06-21T15:51:14.6817347Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.6819442Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+2026-06-21T15:51:14.6821186Z 	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+2026-06-21T15:51:14.6823058Z 	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+2026-06-21T15:51:14.6825041Z 	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+2026-06-21T15:51:14.6827098Z 	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+2026-06-21T15:51:14.6828880Z 	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+2026-06-21T15:51:14.6830450Z 	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+2026-06-21T15:51:14.6832046Z 	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+2026-06-21T15:51:14.6834006Z 	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+2026-06-21T15:51:14.6835087Z 1 actionable task: 1 executed
+2026-06-21T15:51:14.6836722Z 	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+2026-06-21T15:51:14.6844228Z 	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+2026-06-21T15:51:14.6846209Z 	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+2026-06-21T15:51:14.6851722Z 	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+2026-06-21T15:51:14.6853323Z 	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+2026-06-21T15:51:14.6855047Z 	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+2026-06-21T15:51:14.6856976Z 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+2026-06-21T15:51:14.6881456Z 	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+2026-06-21T15:51:14.6883231Z 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+2026-06-21T15:51:14.6884824Z 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+2026-06-21T15:51:14.6887422Z Caused by: com.android.builder.errors.EvalIssueException: Configuration `:app:debugRuntimeClasspath` contains AndroidX dependencies, but the `android.useAndroidX` property is not enabled, which may cause runtime issues.
+2026-06-21T15:51:14.6889603Z Set `android.useAndroidX=true` in the `gradle.properties` file and retry.
+2026-06-21T15:51:14.6890589Z The following AndroidX dependencies are detected:
+2026-06-21T15:51:14.6891309Z :app:debugRuntimeClasspath -> androidx.core:core-ktx:1.12.0
+2026-06-21T15:51:14.6892437Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.annotation:annotation:1.6.0
+2026-06-21T15:51:14.6894242Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.annotation:annotation:1.6.0 -> androidx.annotation:annotation-jvm:1.6.0
+2026-06-21T15:51:14.6896286Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.core:core:1.12.0
+2026-06-21T15:51:14.6897733Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.annotation:annotation-experimental:1.3.0
+2026-06-21T15:51:14.6899491Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1 -> androidx.collection:collection:1.1.0
+2026-06-21T15:51:14.6901660Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.core:core:1.12.0 -> androidx.concurrent:concurrent-futures:1.1.0
+2026-06-21T15:51:14.6904010Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1 -> androidx.vectordrawable:vectordrawable-animated:1.1.0 -> androidx.interpolator:interpolator:1.0.0
+2026-06-21T15:51:14.6906250Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.lifecycle:lifecycle-runtime:2.6.1
+2026-06-21T15:51:14.6907910Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.savedstate:savedstate:1.2.1 -> androidx.arch.core:core-common:2.2.0
+2026-06-21T15:51:14.6910095Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.lifecycle:lifecycle-livedata-core:2.6.1 -> androidx.arch.core:core-runtime:2.2.0
+2026-06-21T15:51:14.6912285Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.savedstate:savedstate:1.2.1 -> androidx.lifecycle:lifecycle-common:2.6.1
+2026-06-21T15:51:14.6914422Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.loader:loader:1.0.0 -> androidx.lifecycle:lifecycle-livedata:2.6.1
+2026-06-21T15:51:14.6917046Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.lifecycle:lifecycle-livedata-core:2.6.1
+2026-06-21T15:51:14.6918943Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2:1.2.0 -> androidx.lifecycle:lifecycle-process:2.6.1
+2026-06-21T15:51:14.6920039Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2:1.2.0 -> androidx.startup:startup-runtime:1.1.1
+2026-06-21T15:51:14.6921098Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.activity:activity:1.8.0 -> androidx.tracing:tracing:1.0.0
+2026-06-21T15:51:14.6922057Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.lifecycle:lifecycle-viewmodel:2.6.1
+2026-06-21T15:51:14.6923139Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1
+2026-06-21T15:51:14.6924157Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.savedstate:savedstate:1.2.1
+2026-06-21T15:51:14.6925192Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.activity:activity:1.8.0 -> androidx.profileinstaller:profileinstaller:1.3.0
+2026-06-21T15:51:14.6926588Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.core:core:1.12.0 -> androidx.versionedparcelable:versionedparcelable:1.1.1
+2026-06-21T15:51:14.6927394Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1
+2026-06-21T15:51:14.6928325Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.activity:activity:1.8.0
+2026-06-21T15:51:14.6929195Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1
+2026-06-21T15:51:14.6930095Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.vectordrawable:vectordrawable:1.1.0
+2026-06-21T15:51:14.6931218Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.appcompat:appcompat-resources:1.6.1 -> androidx.vectordrawable:vectordrawable-animated:1.1.0
+2026-06-21T15:51:14.6932263Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.cursoradapter:cursoradapter:1.0.0
+2026-06-21T15:51:14.6933137Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.drawerlayout:drawerlayout:1.1.1
+2026-06-21T15:51:14.6934199Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.drawerlayout:drawerlayout:1.1.1 -> androidx.customview:customview:1.1.0
+2026-06-21T15:51:14.6935307Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2:1.2.0
+2026-06-21T15:51:14.6936343Z :app:debugRuntimeClasspath -> androidx.appcompat:appcompat:1.6.1 -> androidx.emoji2:emoji2-views-helper:1.2.0
+2026-06-21T15:51:14.6937179Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6
+2026-06-21T15:51:14.6938158Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.viewpager:viewpager:1.0.0
+2026-06-21T15:51:14.6939222Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.fragment:fragment:1.3.6 -> androidx.loader:loader:1.0.0
+2026-06-21T15:51:14.6940271Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.resourceinspection:resourceinspection-annotation:1.0.1
+2026-06-21T15:51:14.6941055Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0
+2026-06-21T15:51:14.6941772Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.cardview:cardview:1.0.0
+2026-06-21T15:51:14.6942672Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.coordinatorlayout:coordinatorlayout:1.1.0
+2026-06-21T15:51:14.6943629Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.constraintlayout:constraintlayout:2.0.1
+2026-06-21T15:51:14.6945063Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.constraintlayout:constraintlayout:2.0.1 -> androidx.constraintlayout:constraintlayout-solver:2.0.1
+2026-06-21T15:51:14.6946494Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0
+2026-06-21T15:51:14.6947670Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0
+2026-06-21T15:51:14.6949201Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0 -> androidx.documentfile:documentfile:1.0.0
+2026-06-21T15:51:14.6950937Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0 -> androidx.localbroadcastmanager:localbroadcastmanager:1.0.0
+2026-06-21T15:51:14.6952640Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.dynamicanimation:dynamicanimation:1.0.0 -> androidx.legacy:legacy-support-core-utils:1.0.0 -> androidx.print:print:1.0.0
+2026-06-21T15:51:14.6953799Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.recyclerview:recyclerview:1.1.0
+2026-06-21T15:51:14.6954695Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.transition:transition:1.2.0
+2026-06-21T15:51:14.6955553Z :app:debugRuntimeClasspath -> com.google.android.material:material:1.10.0 -> androidx.viewpager2:viewpager2:1.0.0
+2026-06-21T15:51:14.6956473Z 	at com.android.builder.errors.IssueReporter.reportError(IssueReporter.kt:114)
+2026-06-21T15:51:14.6957140Z 	at com.android.builder.errors.IssueReporter.reportError$default(IssueReporter.kt:110)
+2026-06-21T15:51:14.6958129Z 	at com.android.build.gradle.internal.dependency.AndroidXDependencyCheck$AndroidXDisabledJetifierDisabled.execute(AndroidXDependencyCheck.kt:72)
+2026-06-21T15:51:14.6959355Z 	at com.android.build.gradle.internal.dependency.AndroidXDependencyCheck$AndroidXDisabledJetifierDisabled.execute(AndroidXDependencyCheck.kt:40)
+2026-06-21T15:51:14.6960579Z 	at org.gradle.configuration.internal.DefaultUserCodeApplicationContext$CurrentApplication$1.execute(DefaultUserCodeApplicationContext.java:123)
+2026-06-21T15:51:14.6961596Z 	at org.gradle.internal.event.BroadcastDispatch$ActionInvocationHandler.dispatch(BroadcastDispatch.java:99)
+2026-06-21T15:51:14.6962590Z 	at org.gradle.internal.event.BroadcastDispatch$ActionInvocationHandler.dispatch(BroadcastDispatch.java:87)
+2026-06-21T15:51:14.6963426Z 	at org.gradle.internal.event.AbstractBroadcastDispatch.dispatch(AbstractBroadcastDispatch.java:43)
+2026-06-21T15:51:14.6964255Z 	at org.gradle.internal.event.BroadcastDispatch$SingletonDispatch.dispatch(BroadcastDispatch.java:268)
+2026-06-21T15:51:14.6965075Z 	at org.gradle.internal.event.BroadcastDispatch$SingletonDispatch.dispatch(BroadcastDispatch.java:170)
+2026-06-21T15:51:14.6966053Z 	at org.gradle.internal.event.AbstractBroadcastDispatch.dispatch(AbstractBroadcastDispatch.java:83)
+2026-06-21T15:51:14.6966886Z 	at org.gradle.internal.event.AbstractBroadcastDispatch.dispatch(AbstractBroadcastDispatch.java:69)
+2026-06-21T15:51:14.6967695Z 	at org.gradle.internal.event.BroadcastDispatch$CompositeDispatch.dispatch(BroadcastDispatch.java:381)
+2026-06-21T15:51:14.6968489Z 	at org.gradle.internal.event.BroadcastDispatch$CompositeDispatch.dispatch(BroadcastDispatch.java:272)
+2026-06-21T15:51:14.6969226Z 	at org.gradle.internal.event.ListenerBroadcast.dispatch(ListenerBroadcast.java:148)
+2026-06-21T15:51:14.6969894Z 	at org.gradle.internal.event.ListenerBroadcast.dispatch(ListenerBroadcast.java:37)
+2026-06-21T15:51:14.6970744Z 	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+2026-06-21T15:51:14.6971478Z 	at jdk.proxy1/jdk.proxy1.$Proxy61.afterResolve(Unknown Source)
+2026-06-21T15:51:14.6972420Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$1.call(DefaultConfiguration.java:730)
+2026-06-21T15:51:14.6973343Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$1.call(DefaultConfiguration.java:709)
+2026-06-21T15:51:14.6974386Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+2026-06-21T15:51:14.6975551Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+2026-06-21T15:51:14.6976763Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+2026-06-21T15:51:14.6977673Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.6978622Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+2026-06-21T15:51:14.6979538Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.6980426Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+2026-06-21T15:51:14.6981320Z 	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+2026-06-21T15:51:14.6982346Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration.resolveGraphIfRequired(DefaultConfiguration.java:709)
+2026-06-21T15:51:14.6983467Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration.lambda$resolveExclusively$3(DefaultConfiguration.java:689)
+2026-06-21T15:51:14.6984582Z 	at org.gradle.api.internal.project.DefaultProjectStateRegistry$CalculatedModelValueImpl.update(DefaultProjectStateRegistry.java:504)
+2026-06-21T15:51:14.6985663Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration.resolveExclusively(DefaultConfiguration.java:686)
+2026-06-21T15:51:14.6986885Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration.resolveToStateOrLater(DefaultConfiguration.java:682)
+2026-06-21T15:51:14.6987927Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration.access$1900(DefaultConfiguration.java:170)
+2026-06-21T15:51:14.6989025Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$VisitedArtifactsSetProvider.getValue(DefaultConfiguration.java:1656)
+2026-06-21T15:51:14.6990350Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$VisitedArtifactsSetProvider.getValue(DefaultConfiguration.java:1645)
+2026-06-21T15:51:14.6991534Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$SelectedArtifactsProvider.getValue(DefaultConfiguration.java:1692)
+2026-06-21T15:51:14.6992690Z 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$SelectedArtifactsProvider.getValue(DefaultConfiguration.java:1661)
+2026-06-21T15:51:14.6993915Z 	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.getSelectedArtifacts(ResolutionBackedFileCollection.java:85)
+2026-06-21T15:51:14.6995159Z 	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.visitContents(ResolutionBackedFileCollection.java:72)
+2026-06-21T15:51:14.6996279Z 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:366)
+2026-06-21T15:51:14.6997189Z 	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:133)
+2026-06-21T15:51:14.6998031Z 	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
+2026-06-21T15:51:14.6998765Z 	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:92)
+2026-06-21T15:51:14.6999726Z 	at org.gradle.api.internal.file.DefaultFileCollectionFactory$ResolvingFileCollection.visitChildren(DefaultFileCollectionFactory.java:285)
+2026-06-21T15:51:14.7000866Z 	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:133)
+2026-06-21T15:51:14.7001716Z 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:366)
+2026-06-21T15:51:14.7002601Z 	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:133)
+2026-06-21T15:51:14.7003465Z 	at org.gradle.api.internal.tasks.PropertyFileCollection.visitChildren(PropertyFileCollection.java:48)
+2026-06-21T15:51:14.7004317Z 	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:133)
+2026-06-21T15:51:14.7005157Z 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:366)
+2026-06-21T15:51:14.7006230Z 	at org.gradle.internal.fingerprint.impl.DefaultFileCollectionSnapshotter.snapshot(DefaultFileCollectionSnapshotter.java:47)
+2026-06-21T15:51:14.7007418Z 	at org.gradle.internal.execution.impl.DefaultInputFingerprinter$InputCollectingVisitor.visitInputFileProperty(DefaultInputFingerprinter.java:133)
+2026-06-21T15:51:14.7008434Z 	at org.gradle.api.internal.tasks.execution.TaskExecution.visitRegularInputs(TaskExecution.java:328)
+2026-06-21T15:51:14.7009419Z 	at org.gradle.internal.execution.impl.DefaultInputFingerprinter.fingerprintInputProperties(DefaultInputFingerprinter.java:63)
+2026-06-21T15:51:14.7010646Z 	at org.gradle.internal.execution.steps.CaptureStateBeforeExecutionStep.captureExecutionStateWithOutputs(CaptureStateBeforeExecutionStep.java:123)
+2026-06-21T15:51:14.7011909Z 	at org.gradle.internal.execution.steps.CaptureStateBeforeExecutionStep.lambda$captureExecutionState$1(CaptureStateBeforeExecutionStep.java:82)
+2026-06-21T15:51:14.7012867Z 	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
+2026-06-21T15:51:14.7013837Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+2026-06-21T15:51:14.7015000Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+2026-06-21T15:51:14.7016215Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+2026-06-21T15:51:14.7017121Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.7018159Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+2026-06-21T15:51:14.7019088Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.7019971Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+2026-06-21T15:51:14.7020853Z 	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+2026-06-21T15:51:14.7021688Z 	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
+2026-06-21T15:51:14.7022711Z 	at org.gradle.internal.execution.steps.CaptureStateBeforeExecutionStep.captureExecutionState(CaptureStateBeforeExecutionStep.java:76)
+2026-06-21T15:51:14.7023852Z 	at org.gradle.internal.execution.steps.CaptureStateBeforeExecutionStep.lambda$execute$0(CaptureStateBeforeExecutionStep.java:70)
+2026-06-21T15:51:14.7024947Z 	at org.gradle.internal.execution.steps.CaptureStateBeforeExecutionStep.execute(CaptureStateBeforeExecutionStep.java:70)
+2026-06-21T15:51:14.7026094Z 	at org.gradle.internal.execution.steps.CaptureStateBeforeExecutionStep.execute(CaptureStateBeforeExecutionStep.java:45)
+2026-06-21T15:51:14.7027095Z 	at org.gradle.internal.execution.steps.SkipEmptyWorkStep.executeWithNonEmptySources(SkipEmptyWorkStep.java:177)
+2026-06-21T15:51:14.7027948Z 	at org.gradle.internal.execution.steps.SkipEmptyWorkStep.execute(SkipEmptyWorkStep.java:81)
+2026-06-21T15:51:14.7028824Z 	at org.gradle.internal.execution.steps.SkipEmptyWorkStep.execute(SkipEmptyWorkStep.java:53)
+2026-06-21T15:51:14.7029914Z 	at org.gradle.internal.execution.steps.RemoveUntrackedExecutionStateStep.execute(RemoveUntrackedExecutionStateStep.java:32)
+2026-06-21T15:51:14.7030974Z 	at org.gradle.internal.execution.steps.RemoveUntrackedExecutionStateStep.execute(RemoveUntrackedExecutionStateStep.java:21)
+2026-06-21T15:51:14.7032079Z 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+2026-06-21T15:51:14.7033161Z 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+2026-06-21T15:51:14.7034160Z 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+2026-06-21T15:51:14.7035093Z 	at org.gradle.internal.execution.steps.CleanupStaleOutputsStep.execute(CleanupStaleOutputsStep.java:75)
+2026-06-21T15:51:14.7036060Z 	at org.gradle.internal.execution.steps.CleanupStaleOutputsStep.execute(CleanupStaleOutputsStep.java:41)
+2026-06-21T15:51:14.7037110Z 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:66)
+2026-06-21T15:51:14.7038260Z 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:66)
+2026-06-21T15:51:14.7039360Z 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:38)
+2026-06-21T15:51:14.7040329Z 	at org.gradle.internal.execution.steps.AssignWorkspaceStep.lambda$execute$0(AssignWorkspaceStep.java:32)
+2026-06-21T15:51:14.7041134Z 	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:293)
+2026-06-21T15:51:14.7041907Z 	at org.gradle.internal.execution.steps.AssignWorkspaceStep.execute(AssignWorkspaceStep.java:30)
+2026-06-21T15:51:14.7042685Z 	at org.gradle.internal.execution.steps.AssignWorkspaceStep.execute(AssignWorkspaceStep.java:21)
+2026-06-21T15:51:14.7043442Z 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:37)
+2026-06-21T15:51:14.7044180Z 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:27)
+2026-06-21T15:51:14.7044918Z 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:47)
+2026-06-21T15:51:14.7045718Z 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:34)
+2026-06-21T15:51:14.7046726Z 	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)
+2026-06-21T15:51:14.7047705Z 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:145)
+2026-06-21T15:51:14.7048714Z 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:134)
+2026-06-21T15:51:14.7049731Z 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+2026-06-21T15:51:14.7050815Z 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+2026-06-21T15:51:14.7051866Z 	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+2026-06-21T15:51:14.7052828Z 	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+2026-06-21T15:51:14.7053774Z 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+2026-06-21T15:51:14.7054757Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+2026-06-21T15:51:14.7055656Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+2026-06-21T15:51:14.7056752Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+2026-06-21T15:51:14.7058192Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+2026-06-21T15:51:14.7059957Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+2026-06-21T15:51:14.7061264Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+2026-06-21T15:51:14.7062182Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.7063078Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+2026-06-21T15:51:14.7063967Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.7064847Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+2026-06-21T15:51:14.7065754Z 	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+2026-06-21T15:51:14.7066943Z 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+2026-06-21T15:51:14.7067792Z 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+2026-06-21T15:51:14.7068766Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+2026-06-21T15:51:14.7069853Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+2026-06-21T15:51:14.7071027Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+2026-06-21T15:51:14.7072060Z 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+2026-06-21T15:51:14.7073084Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+2026-06-21T15:51:14.7074255Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+2026-06-21T15:51:14.7075241Z 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
+2026-06-21T15:51:14.7076389Z 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+2026-06-21T15:51:14.7077146Z 	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+2026-06-21T15:51:14.7078027Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+2026-06-21T15:51:14.7078957Z 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+2026-06-21T15:51:14.7079796Z 	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+2026-06-21T15:51:14.7080587Z 	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+2026-06-21T15:51:14.7081559Z 	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+2026-06-21T15:51:14.7082688Z 	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+2026-06-21T15:51:14.7083820Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+2026-06-21T15:51:14.7084963Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+2026-06-21T15:51:14.7086124Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+2026-06-21T15:51:14.7087312Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.7088224Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+2026-06-21T15:51:14.7089129Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+2026-06-21T15:51:14.7090433Z 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+2026-06-21T15:51:14.7091738Z 	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+2026-06-21T15:51:14.7092746Z 	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+2026-06-21T15:51:14.7093806Z 	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+2026-06-21T15:51:14.7094765Z 	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+2026-06-21T15:51:14.7095668Z 	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+2026-06-21T15:51:14.7097031Z 	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+2026-06-21T15:51:14.7098352Z 	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+2026-06-21T15:51:14.7099962Z 	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+2026-06-21T15:51:14.7101764Z 	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+2026-06-21T15:51:14.7103401Z 	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+2026-06-21T15:51:14.7104873Z 	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+2026-06-21T15:51:14.7106483Z 	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+2026-06-21T15:51:14.7107834Z 	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+2026-06-21T15:51:14.7109331Z 	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+2026-06-21T15:51:14.7111113Z 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+2026-06-21T15:51:14.7112580Z 	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+2026-06-21T15:51:14.7114053Z 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+2026-06-21T15:51:14.7115434Z 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+2026-06-21T15:51:14.7116314Z 
+2026-06-21T15:51:14.7116325Z 
+2026-06-21T15:51:14.7116490Z BUILD FAILED in 1m 2s
+2026-06-21T15:51:15.1119079Z ##[error]Process completed with exit code 1.
+2026-06-21T15:51:15.1278306Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-21T15:51:15.1279482Z Post job cleanup.
+2026-06-21T15:51:15.2624405Z (node:2476) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-21T15:51:15.2625159Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-21T15:51:15.2802765Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-21T15:51:15.2804114Z Post job cleanup.
+2026-06-21T15:51:15.3675520Z [command]/usr/bin/git version
+2026-06-21T15:51:15.3713775Z git version 2.54.0
+2026-06-21T15:51:15.3750252Z Temporarily overriding HOME='/home/runner/work/_temp/4e1ec5b0-d344-44b4-a783-ea51afc70c2b' before making global git config changes
+2026-06-21T15:51:15.3751477Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-21T15:51:15.3756064Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/amy-elite-suite/amy-elite-suite
+2026-06-21T15:51:15.3793449Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-21T15:51:15.3827972Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-21T15:51:15.4103011Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-21T15:51:15.4129830Z http.https://github.com/.extraheader
+2026-06-21T15:51:15.4140378Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-06-21T15:51:15.4172832Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-21T15:51:15.4419889Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-21T15:51:15.4451505Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-21T15:51:15.4834132Z Cleaning up orphan processes
+2026-06-21T15:51:15.5154310Z Terminate orphan process: pid (2341) (java)
+2026-06-21T15:51:15.5167811Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

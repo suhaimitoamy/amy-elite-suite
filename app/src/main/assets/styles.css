@@ -177,8 +177,8 @@ main {
   display: grid;
   place-items: center;
   border-radius: 14px;
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  background: radial-gradient(circle at 30% 20%, #f5d65e, #d4af37 55%, #8d6f12);
+  border: 1px solid var(--primary-gold);
+  background: rgba(20, 20, 20, 0.8);
   overflow: hidden;
 }
 
@@ -191,50 +191,50 @@ main {
 .app-icon.chart i {
   width: 30px;
   height: 22px;
-  border-left: 3px solid #15110a;
-  border-bottom: 3px solid #15110a;
+  border-left: 3px solid var(--primary-gold);
+  border-bottom: 3px solid var(--primary-gold);
   transform: skew(-10deg);
 }
 
 .app-icon.chart b {
   width: 33px;
   height: 18px;
-  border-top: 3px solid #15110a;
+  border-top: 3px solid var(--primary-gold);
   transform: rotate(-25deg);
 }
 
 .app-icon.journal i {
   width: 26px;
   height: 32px;
-  border: 3px solid #15110a;
+  border: 3px solid var(--primary-gold);
   border-radius: 4px;
 }
 
 .app-icon.journal b {
   width: 24px;
   height: 4px;
-  background: #15110a;
+  background: var(--primary-gold);
   transform: rotate(-35deg) translate(8px, 12px);
 }
 
 .app-icon.academy i {
   width: 36px;
   height: 22px;
-  background: #15110a;
+  background: var(--primary-gold);
   clip-path: polygon(50% 0, 100% 42%, 50% 84%, 0 42%);
 }
 
 .app-icon.academy b {
   width: 18px;
   height: 10px;
-  border-bottom: 4px solid #15110a;
+  border-bottom: 4px solid var(--primary-gold);
   bottom: 10px;
 }
 
 .app-icon.mapping i {
   width: 35px;
   height: 28px;
-  border: 3px solid #15110a;
+  border: 3px solid var(--primary-gold);
   clip-path: polygon(0 12%, 33% 0, 66% 12%, 100% 0, 100% 88%, 66% 100%, 33% 88%, 0 100%);
 }
 
@@ -242,20 +242,20 @@ main {
   width: 14px;
   height: 14px;
   border-radius: 50% 50% 50% 0;
-  background: #15110a;
+  background: var(--primary-gold);
   transform: rotate(-45deg) translate(2px, -6px);
 }
 
 .app-icon.code i {
   width: 26px;
   height: 28px;
-  border: 3px solid #15110a;
+  border: 3px solid var(--primary-gold);
   border-radius: 4px;
 }
 
 .app-icon.code b::before {
   content: '</>';
-  color: #15110a;
+  color: var(--primary-gold);
   font-size: 14px;
   font-weight: 900;
 }
