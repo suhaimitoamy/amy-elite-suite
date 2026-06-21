@@ -1,23 +1,16 @@
 # Amy Elite Suite
 
-VIP Facility untuk fasilitas trading pilihan.
+VIP Facility
 
-## Modul final
+Aplikasi ini mencakup:
+- Indikator TradingView
+- Jurnal Trading
+- Amy Trading Academy
+- Aplikasi Mapping
 
-1. Indikator TradingView
-2. Jurnal Trading
-3. Amy Trading Academy
-4. Aplikasi Mapping
-
-## Navigasi final
-
+Halaman utama:
 - Beranda
 - Proyek
 - Koleksi
 
-## Koleksi
-
-- Favorit
-- Riwayat Dibuka
-- Kode Tersimpan
-- Update Project
+Fitur Learning.
