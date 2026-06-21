@@ -1,6 +1,6 @@
 # Amy Elite Suite
 
-Amy Elite Suite adalah aplikasi hub premium untuk mengakses fasilitas trading pilihan dalam satu tempat.
+VIP Facility untuk fasilitas trading pilihan.
 
 ## Modul final
 
@@ -9,19 +9,15 @@ Amy Elite Suite adalah aplikasi hub premium untuk mengakses fasilitas trading pi
 3. Amy Trading Academy
 4. Aplikasi Mapping
 
-## Navigasi utama
+## Navigasi final
 
 - Beranda
 - Proyek
 - Koleksi
 
-## Catatan konsep
+## Koleksi
 
-Aplikasi dibuat sebagai PWA statis yang bisa dijadikan basis APK/WebView. Semua target PWA dibuka dari dalam aplikasi, bukan diarahkan sebagai daftar link GitHub.
-
-## Build lokal
-
-```bash
-npm run build
-npm test
-```
+- Favorit
+- Riwayat Dibuka
+- Kode Tersimpan
+- Update Project
