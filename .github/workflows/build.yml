@@ -1,4 +1,4 @@
-name: Build, Validate, and Deploy
+name: Build, Validate, and Package
 
 on:
   push:
@@ -9,11 +9,8 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  build-and-deploy:
+  build-and-package:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -33,9 +30,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Application Package
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          name: Amy-Elite-Suite-App
+          path: ./dist
