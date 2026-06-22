@@ -124,7 +124,7 @@ class MainActivity : Activity() {
                     request.setMimeType(mimetype)
                     request.addRequestHeader("User-Agent", userAgent)
                     request.setDescription("Downloading file...")
-                    request.setTitle("Amy Elite Suite Download")
+                    request.setTitle("Amy Download")
                     request.allowScanningByMediaScanner()
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                     request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Amy_Elite_Download_${System.currentTimeMillis()}")
