@@ -90,7 +90,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderKoleksi() {
     setActive('koleksi');
-    mainContent.innerHTML = `<div class="page-header"><h2>Koleksi</h2></div><div class="collection-list"><button class="collection-item">Favorit</button><button class="collection-item">Riwayat Dibuka</button><button class="collection-item">Kode Tersimpan</button><button class="collection-item">Update Project</button></div>`;
+    mainContent.innerHTML = `<div class="page-header"><h2>Koleksi</h2></div><div class="collection-list"><button class="collection-item" data-koleksi="favorit">Favorit</button><button class="collection-item" data-koleksi="riwayat">Riwayat Dibuka</button><button class="collection-item" data-koleksi="kode">Kode Tersimpan</button><button class="collection-item" data-koleksi="update">Update Project</button></div>`;
+  }
+
+  function handleKoleksi(action) {
+    if (action === 'kode') {
+      const savedCode = localStorage.getItem('amy_saved_code');
+      mainContent.innerHTML = `<div class="page-header row"><button class="back-btn" data-nav="koleksi">‹</button><h2>Kode Tersimpan</h2></div><section class="code-panel"><pre id="code-display">${savedCode || 'Belum ada kode tersimpan.'}</pre><div class="actions"><button class="action-btn primary" data-copy-koleksi>Salin Kode</button></div></section>`;
+    } else if (action === 'favorit' || action === 'riwayat') {
+      alert('Fitur ini akan segera hadir pada update berikutnya.');
+    } else if (action === 'update') {
+      alert('Project saat ini sudah menggunakan versi terbaru.');
+    }
   }
 
   function renderIndicatorList(category = 'Semua', query = '') {
@@ -149,12 +160,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtn = event.target.closest('[data-filter]');
     const copyBtn = event.target.closest('[data-copy-code]');
     const saveBtn = event.target.closest('[data-save-code]');
+    const koleksiBtn = event.target.closest('[data-koleksi]');
+    const copyKoleksiBtn = event.target.closest('[data-copy-koleksi]');
     if (openBtn) openProject(openBtn.dataset.open);
     if (navBtn) navigate(navBtn.dataset.nav);
     if (indicatorBtn) { selectedIndicator = indicators[Number(indicatorBtn.dataset.selectIndicator)]; renderIndikator(); }
     if (filterBtn) { document.querySelectorAll('.pill').forEach(item => item.classList.remove('active')); filterBtn.classList.add('active'); renderIndicatorList(filterBtn.dataset.filter, document.getElementById('indicator-search')?.value || ''); }
     if (copyBtn) { try { await navigator.clipboard.writeText(selectedIndicator.code); } catch (error) {} copyBtn.textContent = 'Tersalin'; }
     if (saveBtn) { localStorage.setItem('amy_saved_code', selectedIndicator.code); saveBtn.textContent = 'Tersimpan'; }
+    if (koleksiBtn) handleKoleksi(koleksiBtn.dataset.koleksi);
+    if (copyKoleksiBtn) { try { await navigator.clipboard.writeText(localStorage.getItem('amy_saved_code') || ''); } catch(e){} copyKoleksiBtn.textContent = 'Tersalin'; }
   });
 
   document.addEventListener('input', event => {
