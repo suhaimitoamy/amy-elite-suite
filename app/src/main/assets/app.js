@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const projects = [
     { id: 'indikator', title: 'Indikator TradingView', badge: 'Library', icon: 'chart', desc: 'Library indikator & file Pine Script', target: 'internal' },
-    { id: 'jurnal', title: 'Jurnal Trading', badge: 'Jurnal', icon: 'journal', desc: 'Catat jurnal, evaluasi performa, dan riwayat trading', target: site + 'Jurnal-trading/' },
+    { id: 'jurnal', title: 'Jurnal Trading', badge: 'Jurnal', icon: 'journal', desc: 'Catat jurnal, evaluasi performa, dan riwayat trading', target: site + 'Build-aplikasi/index.html?v=20260517multiprovider' },
     { id: 'academy', title: 'Amy Trading Academy', badge: 'Learning', icon: 'academy', desc: 'Materi belajar trading dalam aplikasi', target: site + 'amy-trading-academy/' },
     { id: 'mapping', title: 'Aplikasi Mapping', badge: 'Mapping', icon: 'mapping', desc: 'Mapping market & chart untuk analisis peluang', target: site + 'ai-chart-analyzer-pwa/' }
   ];
