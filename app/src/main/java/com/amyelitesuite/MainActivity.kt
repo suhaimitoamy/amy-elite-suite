@@ -163,7 +163,6 @@ class MainActivity : Activity() {
     // JS Interface to save base64 blobs
     inner class WebAppInterface(private val mContext: Context) {
         @JavascriptInterface
-                @JavascriptInterface
         fun startBackgroundScanner() {
             try {
                 val intent = Intent(mContext, ScannerService::class.java)

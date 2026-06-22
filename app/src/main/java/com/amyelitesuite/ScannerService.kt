@@ -16,7 +16,7 @@ class ScannerService : Service() {
         return null
     }
 
-    override fun onStartCommand(intent: Intent?, flags: int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == "STOP_SCANNER") {
             stopForeground(true)
             stopSelf()
