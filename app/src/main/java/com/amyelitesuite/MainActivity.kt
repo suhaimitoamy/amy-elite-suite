@@ -51,7 +51,7 @@ class MainActivity : Activity() {
         // Initialize Notification Channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "amy_alerts",
+                "amy_alerts_v2",
                 "Trading Alerts",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
@@ -59,6 +59,11 @@ class MainActivity : Activity() {
                 enableLights(true)
                 lightColor = Color.GREEN
                 enableVibration(true)
+                val audioAttributes = android.media.AudioAttributes.Builder()
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                    .build()
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
             }
             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             nm.createNotificationChannel(channel)
@@ -169,7 +174,7 @@ class MainActivity : Activity() {
                 )
 
                 val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    Notification.Builder(mContext, "amy_alerts")
+                    Notification.Builder(mContext, "amy_alerts_v2")
                 } else {
                     @Suppress("DEPRECATION")
                     Notification.Builder(mContext)
