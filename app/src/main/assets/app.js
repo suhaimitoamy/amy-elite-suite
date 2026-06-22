@@ -206,22 +206,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // GLOBAL AMY FX JS SYSTEM
 window.showToast = function(msg) {
-  if ('vibrate' in navigator) navigator.vibrate(50);
-  let container = document.getElementById('amy-toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'amy-toast-container';
-    document.body.appendChild(container);
+  // Use native Android Toast instead of Web Toast
+  if (window.Android && window.Android.showAppToast) {
+    // Strip HTML tags if any, because Android Toast doesn't support HTML easily
+    const plainMsg = msg.replace(/<[^>]*>?/gm, '');
+    window.Android.showAppToast(plainMsg);
+  } else {
+    console.log("Toast:", msg);
   }
-  const toast = document.createElement('div');
-  toast.className = 'amy-toast';
-  toast.innerHTML = msg;
-  container.appendChild(toast);
-  setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3000);
 };
 
 window.triggerHaptic = function(pattern) {
-  if ('vibrate' in navigator) navigator.vibrate(pattern || 20);
+  // Use native Android Haptic Vibration
+  if (window.Android && window.Android.triggerHaptic) {
+    window.Android.triggerHaptic(pattern || 20);
+  } else if ('vibrate' in navigator) {
+    navigator.vibrate(pattern || 20);
+  }
 };
 
 if (!window.amyHapticListenerAdded) {

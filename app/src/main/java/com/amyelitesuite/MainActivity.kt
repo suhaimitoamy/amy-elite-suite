@@ -47,7 +47,6 @@ class MainActivity : Activity() {
         swipeRefreshLayout = SwipeRefreshLayout(this)
         swipeRefreshLayout.layoutParams = matchParentParams
         
-        
         // Initialize Notification Channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -162,6 +161,29 @@ class MainActivity : Activity() {
 
     // JS Interface to save base64 blobs
     inner class WebAppInterface(private val mContext: Context) {
+        
+        @JavascriptInterface
+        fun showAppToast(message: String) {
+            (mContext as Activity).runOnUiThread {
+                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        @JavascriptInterface
+        fun triggerHaptic(pattern: Int) {
+            try {
+                val vibrator = mContext.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(android.os.VibrationEffect.createOneShot(pattern.toLong(), android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(pattern.toLong())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         @JavascriptInterface
         fun startBackgroundScanner() {
             try {
@@ -186,6 +208,7 @@ class MainActivity : Activity() {
                 e.printStackTrace()
             }
         }
+
 
         @JavascriptInterface
         fun showNotification(title: String, message: String) {
