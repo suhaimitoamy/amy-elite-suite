@@ -104,12 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderProjectList(title) {
     setActive(title === 'Beranda' ? 'beranda' : 'proyek');
-    mainContent.innerHTML = `<div class="page-header"><h2>${title}</h2></div><div class="project-grid">${projects.map(projectCard).join('')}</div>`;
+    mainContent.innerHTML = `<div class="page-header"><h2>${title}</h2></div><div class="project-grid slide-up">${projects.map(projectCard).join('')}</div>`;
   }
 
   function renderKoleksi() {
     setActive('koleksi');
-    mainContent.innerHTML = `<div class="page-header"><h2>Koleksi</h2></div><div class="collection-list"><button class="collection-item" data-koleksi="favorit">Favorit</button><button class="collection-item" data-koleksi="riwayat">Riwayat Dibuka</button><button class="collection-item" data-koleksi="kode">Kode Tersimpan</button><button class="collection-item" data-koleksi="update">Update Project</button></div>`;
+    mainContent.innerHTML = `<div class="page-header"><h2>Koleksi</h2></div><div class="collection-list slide-up"><button class="collection-item" data-koleksi="favorit">Favorit</button><button class="collection-item" data-koleksi="riwayat">Riwayat Dibuka</button><button class="collection-item" data-koleksi="kode">Kode Tersimpan</button><button class="collection-item" data-koleksi="update">Update Project</button></div>`;
   }
 
   function handleKoleksi(action) {
@@ -117,9 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const savedCode = localStorage.getItem('amy_saved_code');
       mainContent.innerHTML = `<div class="page-header row"><button class="back-btn" data-nav="koleksi">‹</button><h2>Kode Tersimpan</h2></div><section class="code-panel"><pre id="code-display">${savedCode || 'Belum ada kode tersimpan.'}</pre><div class="actions"><button class="action-btn primary" data-copy-koleksi>Salin Kode</button></div></section>`;
     } else if (action === 'favorit' || action === 'riwayat') {
-      alert('Fitur ini akan segera hadir pada update berikutnya.');
+      showToast('Fitur ini akan segera hadir pada update berikutnya.');
     } else if (action === 'update') {
-      alert('Project saat ini sudah menggunakan versi terbaru.');
+      showToast('Project saat ini sudah menggunakan versi terbaru.');
     }
   }
 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryOptions = ['Semua', ...new Set(indicators.map(i => i.category))];
     const pillsHTML = categoryOptions.map(cat => `<button class="pill ${cat === 'Semua' ? 'active' : ''}" data-filter="${cat}">${cat}</button>`).join('');
 
-    mainContent.innerHTML = `<div class="page-header row"><button class="back-btn" data-nav="proyek">‹</button><h2>Indikator TradingView</h2></div><input id="indicator-search" class="search-input" placeholder="Cari indikator..."><div class="pill-row">${pillsHTML}</div><div id="indicator-list" class="indicator-list"></div><section class="code-panel"><span class="badge">Terpilih</span><h3>${selectedIndicator.name}</h3><p>${selectedIndicator.desc}</p><pre id="code-display">${selectedIndicator.code || 'Mengambil source code dari GitHub...'}</pre><div class="actions"><button class="action-btn" data-save-code>Simpan Kode</button><button class="action-btn primary" data-copy-code>Salin Kode</button></div></section>`;
+    mainContent.innerHTML = `<div class="page-header row"><button class="back-btn" data-nav="proyek">‹</button><h2>Indikator TradingView</h2></div><input id="indicator-search" class="search-input" placeholder="Cari indikator..."><div class="pill-row">${pillsHTML}</div><div id="indicator-list" class="indicator-list slide-up"></div><section class="code-panel"><span class="badge">Terpilih</span><h3>${selectedIndicator.name}</h3><p>${selectedIndicator.desc}</p><pre id="code-display">${selectedIndicator.code || 'Mengambil source code dari GitHub...'}</pre><div class="actions"><button class="action-btn" data-save-code>Simpan Kode</button><button class="action-btn primary" data-copy-code>Salin Kode</button></div></section>`;
     
     renderIndicatorList();
 
@@ -202,3 +202,32 @@ document.addEventListener('DOMContentLoaded', () => {
   navBtns.forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.target)));
   navigate('beranda');
 });
+
+
+// GLOBAL AMY FX JS SYSTEM
+window.showToast = function(msg) {
+  if ('vibrate' in navigator) navigator.vibrate(50);
+  let container = document.getElementById('amy-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'amy-toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'amy-toast';
+  toast.innerHTML = msg;
+  container.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3000);
+};
+
+window.triggerHaptic = function(pattern) {
+  if ('vibrate' in navigator) navigator.vibrate(pattern || 20);
+};
+
+if (!window.amyHapticListenerAdded) {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button, a, .clickable, .nav-btn, .action-btn, .card');
+      if (btn) window.triggerHaptic(20);
+    });
+    window.amyHapticListenerAdded = true;
+}
