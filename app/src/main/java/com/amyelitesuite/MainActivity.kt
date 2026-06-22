@@ -29,11 +29,19 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Define LayoutParams to fix cut-off display
+        val matchParentParams = android.view.ViewGroup.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
         // Initialize SwipeRefreshLayout
         swipeRefreshLayout = SwipeRefreshLayout(this)
+        swipeRefreshLayout.layoutParams = matchParentParams
         
         // Initialize WebView
         webView = WebView(this)
+        webView.layoutParams = matchParentParams
         swipeRefreshLayout.addView(webView)
         setContentView(swipeRefreshLayout)
 
