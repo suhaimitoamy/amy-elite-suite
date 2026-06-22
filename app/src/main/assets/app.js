@@ -10,14 +10,50 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'mapping', title: 'Aplikasi Mapping', badge: 'Mapping', icon: 'mapping', desc: 'Mapping market & chart untuk analisis peluang', target: site + 'ai-chart-analyzer-pwa/' }
   ];
 
-  const indicators = [
-    { name: 'SMC Structure Pro', category: 'SMC', desc: 'Deteksi BOS, CHOCH, liquidity', code: 'SMC Structure Pro' },
-    { name: 'Order Block Finder', category: 'SMC', desc: 'Zona OB bullish & bearish', code: 'Order Block Finder' },
-    { name: 'Session Marker WIB', category: 'Session', desc: 'Killzone London & New York', code: 'Session Marker WIB' },
-    { name: 'FVG Detector', category: 'FVG', desc: 'Fair Value Gap otomatis', code: 'FVG Detector' }
+  let indicators = [
+    { name: 'Memuat data...', category: 'Loading', desc: 'Mengambil indikator dari repo...', code: 'Loading...' }
   ];
 
   let selectedIndicator = indicators[0];
+
+  async function loadRepoIndicators() {
+    try {
+      const res = await fetch('https://api.github.com/repos/suhaimitoamy/Indikator-trading-view/contents/');
+      if (!res.ok) throw new Error('API limit or network error');
+      const data = await res.json();
+      
+      const repoIndicators = data
+        .filter(item => item.name.endsWith('.pine'))
+        .map(item => {
+           let formattedName = item.name.replace('.pine', '').replace(/[-_]/g, ' ');
+           formattedName = formattedName.replace(/\b\w/g, l => l.toUpperCase());
+           return {
+             name: formattedName,
+             category: 'Pine Script',
+             desc: `File sumber: ${item.name}`,
+             url: item.download_url,
+             code: ''
+           };
+        });
+
+      if (repoIndicators.length > 0) {
+         indicators = repoIndicators;
+         selectedIndicator = indicators[0];
+         if (document.getElementById('indicator-list')) {
+            renderIndikator();
+         }
+      } else {
+         indicators = [{ name: 'Kosong', category: 'Empty', desc: 'Tidak ada file .pine di repo.', code: 'Kosong' }];
+         if (document.getElementById('indicator-list')) renderIndikator();
+      }
+    } catch (err) {
+      console.error(err);
+      indicators = [{ name: 'Error', category: 'Error', desc: 'Gagal mengambil data indikator.', code: 'Gagal' }];
+      if (document.getElementById('indicator-list')) renderIndikator();
+    }
+  }
+
+  loadRepoIndicators();
 
   const svgs = {
     chart: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"></path><path d="M16 14h4v-2h-4zM10 8h4V6h-4zM4 16h4v-2H4z"></path><polyline points="4 14 10 8 16 14 22 4"></polyline></svg>`,
@@ -61,13 +97,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.getElementById('indicator-list');
     if (!list) return;
     const filtered = indicators.filter(item => (category === 'Semua' || item.category === category) && (item.name.toLowerCase().includes(query.toLowerCase()) || item.desc.toLowerCase().includes(query.toLowerCase())));
-    list.innerHTML = filtered.map((item, index) => `<button class="indicator-item" data-select-indicator="${index}">${icon('code')}<span><strong>${item.name}</strong><small>${item.desc}</small></span><span class="chevron">›</span></button>`).join('') || '<div class="empty">Indikator tidak ditemukan.</div>';
+    list.innerHTML = filtered.map(item => {
+      const originalIndex = indicators.indexOf(item);
+      return `<button class="indicator-item" data-select-indicator="${originalIndex}">${icon('code')}<span><strong>${item.name}</strong><small>${item.desc}</small></span><span class="chevron">›</span></button>`;
+    }).join('') || '<div class="empty">Indikator tidak ditemukan.</div>';
   }
 
-  function renderIndikator() {
+  async function renderIndikator() {
     setActive('proyek');
-    mainContent.innerHTML = `<div class="page-header row"><button class="back-btn" data-nav="proyek">‹</button><h2>Indikator TradingView</h2></div><input id="indicator-search" class="search-input" placeholder="Cari indikator..."><div class="pill-row"><button class="pill active" data-filter="Semua">Semua</button><button class="pill" data-filter="SMC">SMC</button><button class="pill" data-filter="Session">Session</button><button class="pill" data-filter="FVG">FVG</button></div><div id="indicator-list" class="indicator-list"></div><section class="code-panel"><span class="badge">Terpilih</span><h3>${selectedIndicator.name}</h3><p>${selectedIndicator.desc}</p><pre>${selectedIndicator.code}</pre><div class="actions"><button class="action-btn" data-save-code>Simpan Kode</button><button class="action-btn primary" data-copy-code>Salin Kode</button></div></section>`;
+    const categoryOptions = ['Semua', ...new Set(indicators.map(i => i.category))];
+    const pillsHTML = categoryOptions.map(cat => `<button class="pill ${cat === 'Semua' ? 'active' : ''}" data-filter="${cat}">${cat}</button>`).join('');
+
+    mainContent.innerHTML = `<div class="page-header row"><button class="back-btn" data-nav="proyek">‹</button><h2>Indikator TradingView</h2></div><input id="indicator-search" class="search-input" placeholder="Cari indikator..."><div class="pill-row">${pillsHTML}</div><div id="indicator-list" class="indicator-list"></div><section class="code-panel"><span class="badge">Terpilih</span><h3>${selectedIndicator.name}</h3><p>${selectedIndicator.desc}</p><pre id="code-display">${selectedIndicator.code || 'Mengambil source code dari GitHub...'}</pre><div class="actions"><button class="action-btn" data-save-code>Simpan Kode</button><button class="action-btn primary" data-copy-code>Salin Kode</button></div></section>`;
+    
     renderIndicatorList();
+
+    if (!selectedIndicator.code && selectedIndicator.url) {
+       try {
+         const res = await fetch(selectedIndicator.url);
+         const text = await res.text();
+         selectedIndicator.code = text;
+         const codeDisplay = document.getElementById('code-display');
+         if (codeDisplay) codeDisplay.textContent = text;
+       } catch (err) {
+         const codeDisplay = document.getElementById('code-display');
+         if (codeDisplay) codeDisplay.textContent = 'Gagal memuat kode. Periksa koneksi internet.';
+       }
+    }
   }
 
   function openProject(id) {
