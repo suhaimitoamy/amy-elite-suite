@@ -7,8 +7,27 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'indikator', title: 'Indikator TradingView', badge: 'Library', icon: 'chart', desc: 'Library indikator & file Pine Script', target: 'internal' },
     { id: 'jurnal', title: 'Jurnal Trading', badge: 'Jurnal', icon: 'journal', desc: 'Catat jurnal, evaluasi performa, dan riwayat trading', target: site + 'Build-aplikasi/index.html?v=20260517multiprovider' },
     { id: 'academy', title: 'Amy Trading Academy', badge: 'Learning', icon: 'academy', desc: 'Materi belajar trading dalam aplikasi', target: site + 'amy-trading-academy/' },
-    { id: 'mapping', title: 'Aplikasi Mapping', badge: 'Mapping', icon: 'mapping', desc: 'Mapping market & chart untuk analisis peluang', target: site + 'ai-chart-analyzer-pwa/' }
+    { id: 'mapping', title: 'Mapping', badge: 'Mapping', icon: 'mapping', desc: 'Mapping market & chart untuk analisis peluang', target: site + 'ai-chart-analyzer-pwa/' }
   ];
+
+  function showLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.backgroundColor = 'var(--bg-color)';
+    overlay.style.zIndex = '9999';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.color = 'var(--primary-gold)';
+    overlay.style.fontFamily = 'sans-serif';
+    overlay.innerHTML = `<div style="width: 40px; height: 40px; border: 3px solid rgba(255,193,7,0.2); border-top-color: var(--primary-gold); border-radius: 50%; animation: spin 1s linear infinite;"></div><p style="margin-top: 16px; font-weight: bold; font-size: 14px;">Memuat Aplikasi...</p><style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>`;
+    document.body.appendChild(overlay);
+  }
 
   let indicators = [
     { name: 'Memuat data...', category: 'Loading', desc: 'Mengambil indikator dari repo...', code: 'Loading...' }
@@ -143,7 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (project.target === 'internal') {
       renderIndikator();
     } else {
-      location.assign(project.target);
+      showLoadingOverlay();
+      setTimeout(() => location.assign(project.target), 100);
     }
   }
 
