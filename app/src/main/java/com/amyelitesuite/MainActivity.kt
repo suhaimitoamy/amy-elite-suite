@@ -24,6 +24,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.ValueCallback
+import android.content.ActivityNotFoundException
 import android.widget.Toast
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.io.File
@@ -32,6 +34,8 @@ import java.io.FileOutputStream
 class MainActivity : Activity() {
     private lateinit var webView: WebView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private var fileUploadCallback: ValueCallback<Array<Uri>>? = null
+    private val FILE_CHOOSER_REQUEST_CODE = 100
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +97,30 @@ class MainActivity : Activity() {
         // Add Javascript Interface for Blob downloads
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
 
-        webView.webChromeClient = WebChromeClient() // Enables JS alerts
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                fileUploadCallback?.onReceiveValue(null)
+                fileUploadCallback = filePathCallback
+
+                val intent = fileChooserParams?.createIntent() ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                }
+
+                try {
+                    startActivityForResult(intent, FILE_CHOOSER_REQUEST_CODE)
+                } catch (e: ActivityNotFoundException) {
+                    fileUploadCallback = null
+                    Toast.makeText(this@MainActivity, "Cannot Open File Chooser", Toast.LENGTH_LONG).show()
+                    return false
+                }
+                return true
+            }
+        }
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 swipeRefreshLayout.isRefreshing = false
@@ -156,6 +183,17 @@ class MainActivity : Activity() {
             webView.goBack()
         } else {
             super.onBackPressed()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+            if (fileUploadCallback == null) return
+            val result = if (data == null || resultCode != Activity.RESULT_OK) null else arrayOf(data.data!!)
+            fileUploadCallback?.onReceiveValue(result)
+            fileUploadCallback = null
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -250,23 +288,23 @@ class MainActivity : Activity() {
         fun saveBlob(base64Data: String, filename: String) {
             try {
                 val cleanBase64 = base64Data.replaceFirst("^data:.*?;base64,".toRegex(), "")
-                val pdfAsBytes = Base64.decode(cleanBase64, 0)
+                val fileAsBytes = Base64.decode(cleanBase64, 0)
                 
                 val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 if (!downloadsDir.exists()) downloadsDir.mkdirs()
                 
                 val file = File(downloadsDir, filename)
                 val os = FileOutputStream(file, false)
-                os.write(pdfAsBytes)
+                os.write(fileAsBytes)
                 os.flush()
                 os.close()
                 
                 (mContext as Activity).runOnUiThread {
-                    Toast.makeText(mContext, "PDF tersimpan di folder Download", Toast.LENGTH_LONG).show()
+                    Toast.makeText(mContext, "File tersimpan di folder Download", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 (mContext as Activity).runOnUiThread {
-                    Toast.makeText(mContext, "Gagal menyimpan PDF", Toast.LENGTH_LONG).show()
+                    Toast.makeText(mContext, "Gagal menyimpan file", Toast.LENGTH_LONG).show()
                 }
             }
         }
