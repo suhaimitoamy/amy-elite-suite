@@ -9,8 +9,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 
 class ScannerService : Service() {
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -24,6 +26,12 @@ class ScannerService : Service() {
         }
 
         createNotificationChannel()
+
+        if (wakeLock == null) {
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "amyfx:scanner")
+            wakeLock?.acquire()
+        }
 
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -63,8 +71,17 @@ class ScannerService : Service() {
                 "Background Scanner",
                 NotificationManager.IMPORTANCE_LOW
             )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(serviceChannel)
+            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(serviceChannel)
         }
+    }
+
+    override fun onDestroy() {
+        wakeLock?.let {
+            if (it.isHeld) {
+                it.release()
+            }
+        }
+        super.onDestroy()
     }
 }

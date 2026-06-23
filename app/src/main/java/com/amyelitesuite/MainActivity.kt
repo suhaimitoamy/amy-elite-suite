@@ -79,6 +79,20 @@ class MainActivity : Activity() {
             }
         }
         
+        // Request Ignore Battery Optimization for background execution
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val pm = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                try {
+                    val intent = Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    intent.data = android.net.Uri.parse("package:$packageName")
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        
         // Initialize WebView
 
         webView = WebView(this)
@@ -195,7 +209,9 @@ class MainActivity : Activity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.getStringExtra("target_url")?.let {
-            webView.loadUrl(it)
+            if (webView.url != it) {
+                webView.loadUrl(it)
+            }
         }
     }
 
