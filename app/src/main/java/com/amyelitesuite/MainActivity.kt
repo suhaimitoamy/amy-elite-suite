@@ -252,9 +252,16 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface
-        fun startBackgroundScanner() {
+        fun startBackgroundScanner(apiKey: String?, bsl: String?, ssl: String?) {
             try {
-                val intent = Intent(mContext, ScannerService::class.java)
+                if (!apiKey.isNullOrEmpty() && apiKey != "undefined") {
+                    val prefs = mContext.getSharedPreferences("AmyFXPrefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("api_key", apiKey).apply()
+                }
+                val intent = Intent(mContext, ScannerService::class.java).apply {
+                    putExtra("bsl", bsl)
+                    putExtra("ssl", ssl)
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     mContext.startForegroundService(intent)
                 } else {
