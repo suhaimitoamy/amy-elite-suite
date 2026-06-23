@@ -175,7 +175,13 @@ class MainActivity : Activity() {
             }
         }
 
-        webView.loadUrl("file:///android_asset/index.html")
+        // Handle incoming intent if started from notification
+        val targetUrl = intent.getStringExtra("target_url")
+        if (targetUrl != null) {
+            webView.loadUrl(targetUrl)
+        } else {
+            webView.loadUrl("file:///android_asset/index.html")
+        }
     }
 
     override fun onBackPressed() {
@@ -183,6 +189,13 @@ class MainActivity : Activity() {
             webView.goBack()
         } else {
             super.onBackPressed()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.getStringExtra("target_url")?.let {
+            webView.loadUrl(it)
         }
     }
 
@@ -250,12 +263,22 @@ class MainActivity : Activity() {
 
         @JavascriptInterface
         fun showNotification(title: String, message: String) {
+            showNotificationWithUrl(title, message, null)
+        }
+
+        @JavascriptInterface
+        fun showNotificationWithUrl(title: String, message: String, url: String?) {
             try {
                 val intent = Intent(mContext, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    if (url != null) {
+                        putExtra("target_url", url)
+                    }
                 }
+                // Use a unique request code so intents aren't merged
+                val requestCode = System.currentTimeMillis().toInt()
                 val pendingIntent = PendingIntent.getActivity(
-                    mContext, 0, intent,
+                    mContext, requestCode, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
 
