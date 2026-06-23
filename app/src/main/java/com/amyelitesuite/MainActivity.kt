@@ -284,6 +284,47 @@ class MainActivity : Activity() {
             }
         }
 
+        private var currentFileOutputStream: FileOutputStream? = null
+
+        @JavascriptInterface
+        fun startFile(filename: String) {
+            try {
+                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                if (!downloadsDir.exists()) downloadsDir.mkdirs()
+                val file = File(downloadsDir, filename)
+                currentFileOutputStream = FileOutputStream(file, false)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        @JavascriptInterface
+        fun appendFileChunk(base64Chunk: String) {
+            try {
+                val cleanBase64 = base64Chunk.replaceFirst("^data:.*?;base64,".toRegex(), "")
+                val fileAsBytes = Base64.decode(cleanBase64, 0)
+                currentFileOutputStream?.write(fileAsBytes)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        @JavascriptInterface
+        fun finishFile() {
+            try {
+                currentFileOutputStream?.flush()
+                currentFileOutputStream?.close()
+                currentFileOutputStream = null
+                (mContext as Activity).runOnUiThread {
+                    Toast.makeText(mContext, "File tersimpan di folder Download", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                (mContext as Activity).runOnUiThread {
+                    Toast.makeText(mContext, "Gagal menyimpan file", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
         @JavascriptInterface
         fun saveBlob(base64Data: String, filename: String) {
             try {
