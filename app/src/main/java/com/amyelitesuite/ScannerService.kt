@@ -11,13 +11,21 @@ import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
-import kotlinx.coroutines.*
-import okhttp3.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
-import kotlin.math.min
 
 class ScannerService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
@@ -27,6 +35,7 @@ class ScannerService : Service() {
         .build()
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private lateinit var dataAgent: MarketDataSyncAgent
     private var apiKey: String? = null
     private var bslTarget: Double = 0.0
     private var sslTarget: Double = 0.0
@@ -35,22 +44,12 @@ class ScannerService : Service() {
     private var hasAlertedSsl = false
     private val lastAlertAt = mutableMapOf<String, Long>()
 
-    private var contextReady = false
-    private var lastContextFetch = 0L
     private var recentHigh = 0.0
     private var recentLow = 0.0
     private var eq = 0.0
     private var activeFvg: Zone? = null
     private var discountOb: Zone? = null
     private var premiumOb: Zone? = null
-
-    data class Candle(
-        val open: Double,
-        val high: Double,
-        val low: Double,
-        val close: Double,
-        val time: String
-    )
 
     data class Zone(
         val type: String,
@@ -76,6 +75,10 @@ class ScannerService : Service() {
             wakeLock?.acquire(12 * 60 * 60 * 1000L)
         }
 
+        if (!::dataAgent.isInitialized) {
+            dataAgent = MarketDataSyncAgent(applicationContext, client)
+        }
+
         val prefs = getSharedPreferences("AmyFXPrefs", Context.MODE_PRIVATE)
         apiKey = prefs.getString("api_key", null)
 
@@ -98,10 +101,24 @@ class ScannerService : Service() {
         }
 
         startForegroundServiceNotification()
-        refreshMarketContext(force = true)
+        bootstrapContext()
         startWebSocket()
 
         return START_STICKY
+    }
+
+    private fun bootstrapContext() {
+        serviceScope.launch {
+            try {
+                val rows = dataAgent.bootstrap("XAU/USD", "M5", 300)
+                if (rows.size >= 20) {
+                    buildContext(rows, rows.last().close)
+                    startForegroundServiceNotification()
+                }
+            } catch (e: Exception) {
+                Log.e("AmyFX", "Bootstrap context failed: ${e.message}")
+            }
+        }
     }
 
     private fun startForegroundServiceNotification() {
@@ -156,7 +173,8 @@ class ScannerService : Service() {
                     val json = JSONObject(text)
                     if (json.has("price")) {
                         val currentPrice = json.getDouble("price")
-                        checkTargets(currentPrice)
+                        val timestamp = json.optLong("timestamp", System.currentTimeMillis() / 1000)
+                        checkTargets(currentPrice, timestamp)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -177,8 +195,9 @@ class ScannerService : Service() {
         })
     }
 
-    private fun checkTargets(currentPrice: Double) {
-        refreshMarketContextIfNeeded(currentPrice)
+    private fun checkTargets(currentPrice: Double, timestamp: Long) {
+        val rows = dataAgent.onTick("XAU/USD", "M5", currentPrice, timestamp)
+        if (rows.size >= 20) buildContext(rows, currentPrice)
 
         val fvg = activeFvg
         val inFvg = fvg != null && currentPrice >= fvg.low && currentPrice <= fvg.high
@@ -225,58 +244,7 @@ class ScannerService : Service() {
         }
     }
 
-    private fun refreshMarketContextIfNeeded(currentPrice: Double) {
-        val now = System.currentTimeMillis()
-        if (!contextReady || now - lastContextFetch > 5 * 60 * 1000L) {
-            refreshMarketContext(force = false, currentPrice = currentPrice)
-        }
-    }
-
-    private fun refreshMarketContext(force: Boolean, currentPrice: Double = 0.0) {
-        val now = System.currentTimeMillis()
-        if (!force && now - lastContextFetch < 5 * 60 * 1000L) return
-        lastContextFetch = now
-
-        serviceScope.launch {
-            try {
-                val rows = fetchCandles()
-                if (rows.size < 20) return@launch
-                buildContext(rows, if (currentPrice > 0) currentPrice else rows.last().close)
-                contextReady = true
-                startForegroundServiceNotification()
-            } catch (e: Exception) {
-                Log.e("AmyFX", "Context refresh failed: ${e.message}")
-            }
-        }
-    }
-
-    private fun fetchCandles(): List<Candle> {
-        val key = apiKey ?: return emptyList()
-        val url = "https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=5min&outputsize=120&apikey=$key"
-        val request = Request.Builder().url(url).build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return emptyList()
-            val body = response.body?.string() ?: return emptyList()
-            val json = JSONObject(body)
-            val values = json.optJSONArray("values") ?: return emptyList()
-            val rows = mutableListOf<Candle>()
-            for (i in values.length() - 1 downTo 0) {
-                val item = values.getJSONObject(i)
-                rows.add(
-                    Candle(
-                        open = item.optDouble("open", 0.0),
-                        high = item.optDouble("high", 0.0),
-                        low = item.optDouble("low", 0.0),
-                        close = item.optDouble("close", 0.0),
-                        time = item.optString("datetime", "")
-                    )
-                )
-            }
-            return rows.filter { it.high > 0 && it.low > 0 }
-        }
-    }
-
-    private fun buildContext(rows: List<Candle>, price: Double) {
+    private fun buildContext(rows: List<CandleStore.Candle>, price: Double) {
         val highs = mutableListOf<Double>()
         val lows = mutableListOf<Double>()
 
@@ -307,7 +275,7 @@ class ScannerService : Service() {
         finalBias = calculateFinalBias(price, activeFvg)
     }
 
-    private fun findNearestFvg(rows: List<Candle>, price: Double): Zone? {
+    private fun findNearestFvg(rows: List<CandleStore.Candle>, price: Double): Zone? {
         for (i in rows.size - 3 downTo max(2, rows.size - 20)) {
             val c1 = rows[i - 2]
             val c3 = rows[i]
