@@ -3,10 +3,17 @@ package com.amyelitesuite
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.DownloadManager
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,21 +21,18 @@ import android.os.Environment
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Base64
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
-import android.graphics.Color
-import android.media.RingtoneManager
+import android.view.Gravity
+import android.view.View
 import android.webkit.JavascriptInterface
-
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.webkit.ValueCallback
-import android.content.ActivityNotFoundException
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.io.File
@@ -37,69 +41,50 @@ import java.io.FileOutputStream
 class MainActivity : Activity() {
     private lateinit var webView: WebView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var rootLayout: FrameLayout
+    private lateinit var permissionGate: LinearLayout
+    private lateinit var batteryStatusText: TextView
+    private lateinit var notificationStatusText: TextView
+    private lateinit var scannerStatusText: TextView
     private var fileUploadCallback: ValueCallback<Array<Uri>>? = null
     private val FILE_CHOOSER_REQUEST_CODE = 100
+    private val NOTIFICATION_REQUEST_CODE = 2
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Define LayoutParams to fix cut-off display
         val matchParentParams = android.view.ViewGroup.LayoutParams(
             android.view.ViewGroup.LayoutParams.MATCH_PARENT,
             android.view.ViewGroup.LayoutParams.MATCH_PARENT
         )
 
-        // Initialize SwipeRefreshLayout
+        createNotificationChannels()
+
+        rootLayout = FrameLayout(this)
+        rootLayout.layoutParams = matchParentParams
+
         swipeRefreshLayout = SwipeRefreshLayout(this)
         swipeRefreshLayout.layoutParams = matchParentParams
-        
-        // Initialize Notification Channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "amy_alerts_v2",
-                "Trading Alerts",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "High priority trading signals"
-                enableLights(true)
-                lightColor = Color.GREEN
-                enableVibration(true)
-                val audioAttributes = android.media.AudioAttributes.Builder()
-                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
-                    .build()
-                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
-            }
-            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            nm.createNotificationChannel(channel)
-        }
-
-        // Check POST_NOTIFICATIONS permission for Android 13+
-        if (Build.VERSION.SDK_INT >= 33) {
-            if (checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf("android.permission.POST_NOTIFICATIONS"), 2)
-            }
-        }
-        
-        requestDisableBatteryOptimization(false)
-        
-        // Initialize WebView
 
         webView = WebView(this)
         webView.layoutParams = matchParentParams
         swipeRefreshLayout.addView(webView)
-        setContentView(swipeRefreshLayout)
+        rootLayout.addView(swipeRefreshLayout)
+
+        permissionGate = buildPermissionGate()
+        rootLayout.addView(permissionGate)
+
+        setContentView(rootLayout)
 
         val webSettings: WebSettings = webView.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
         webSettings.loadWithOverviewMode = true
         webSettings.useWideViewPort = true
-        webSettings.cacheMode = WebSettings.LOAD_DEFAULT // Optimize caching
+        webSettings.cacheMode = WebSettings.LOAD_DEFAULT
         webSettings.allowFileAccess = true
 
-        // Add Javascript Interface for Blob downloads
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
 
         webView.webChromeClient = object : WebChromeClient() {
@@ -126,21 +111,19 @@ class MainActivity : Activity() {
                 return true
             }
         }
+
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 swipeRefreshLayout.isRefreshing = false
             }
         }
 
-        // Handle pull-to-refresh
         swipeRefreshLayout.setOnRefreshListener {
             webView.reload()
         }
 
-        // Handle Downloads (PDF Reports)
         webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             if (url.startsWith("blob:")) {
-                // Fetch blob via JS and pass to Android interface
                 webView.evaluateJavascript("""
                     fetch('$url')
                         .then(res => res.blob())
@@ -154,7 +137,6 @@ class MainActivity : Activity() {
                 """.trimIndent(), null)
                 Toast.makeText(this, "Generating PDF...", Toast.LENGTH_SHORT).show()
             } else if (url.startsWith("http")) {
-                // Normal HTTP download
                 try {
                     val request = DownloadManager.Request(Uri.parse(url))
                     request.setMimeType(mimetype)
@@ -173,26 +155,175 @@ class MainActivity : Activity() {
             }
         }
 
-        // Check Storage Permission for older Android versions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
             }
         }
 
-        // Handle incoming intent if started from notification
         val targetUrl = intent.getStringExtra("target_url")
         if (targetUrl != null) {
             webView.loadUrl(targetUrl)
         } else {
             webView.loadUrl("file:///android_asset/index.html")
         }
+
+        updatePermissionGate()
     }
 
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isBatteryOptimizationDisabled()) {
-            Toast.makeText(this, "Amy FX belum Unrestricted. Background scanner bisa mati.", Toast.LENGTH_LONG).show()
+        updatePermissionGate()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == NOTIFICATION_REQUEST_CODE) {
+            updatePermissionGate()
+        }
+    }
+
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "amy_alerts_v2",
+                "Trading Alerts",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "High priority trading signals"
+                enableLights(true)
+                lightColor = Color.GREEN
+                enableVibration(true)
+                val audioAttributes = android.media.AudioAttributes.Builder()
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                    .build()
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
+            }
+            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(channel)
+        }
+    }
+
+    private fun buildPermissionGate(): LinearLayout {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setBackgroundColor(Color.rgb(10, 10, 10))
+            setPadding(dp(22), dp(22), dp(22), dp(22))
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+
+        val title = TextView(this).apply {
+            text = "Amy FX Permission Center"
+            setTextColor(Color.rgb(212, 175, 55))
+            textSize = 22f
+            gravity = Gravity.CENTER
+        }
+
+        val subtitle = TextView(this).apply {
+            text = "Aktifkan izin wajib agar scanner dan notifikasi tetap hidup di background."
+            setTextColor(Color.WHITE)
+            textSize = 14f
+            gravity = Gravity.CENTER
+            setPadding(0, dp(10), 0, dp(20))
+        }
+
+        batteryStatusText = statusText()
+        notificationStatusText = statusText()
+        scannerStatusText = statusText()
+
+        val batteryButton = goldButton("Buka Battery Optimization") {
+            openBatteryOptimizationRequest()
+        }
+
+        val notificationButton = goldButton("Aktifkan Notifikasi") {
+            requestNotificationPermission()
+        }
+
+        val appSettingsButton = darkButton("Buka Detail Aplikasi") {
+            openAppSettings()
+        }
+
+        val recheckButton = darkButton("Cek Ulang Izin") {
+            updatePermissionGate(true)
+        }
+
+        container.addView(title)
+        container.addView(subtitle)
+        container.addView(batteryStatusText)
+        container.addView(notificationStatusText)
+        container.addView(scannerStatusText)
+        container.addView(batteryButton)
+        container.addView(notificationButton)
+        container.addView(appSettingsButton)
+        container.addView(recheckButton)
+
+        return container
+    }
+
+    private fun statusText(): TextView {
+        return TextView(this).apply {
+            setTextColor(Color.WHITE)
+            textSize = 15f
+            setPadding(0, dp(6), 0, dp(6))
+            gravity = Gravity.CENTER
+        }
+    }
+
+    private fun goldButton(label: String, action: () -> Unit): Button {
+        return Button(this).apply {
+            text = label
+            setTextColor(Color.BLACK)
+            setBackgroundColor(Color.rgb(212, 175, 55))
+            setOnClickListener { action() }
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, dp(10), 0, 0) }
+        }
+    }
+
+    private fun darkButton(label: String, action: () -> Unit): Button {
+        return Button(this).apply {
+            text = label
+            setTextColor(Color.WHITE)
+            setBackgroundColor(Color.rgb(35, 35, 35))
+            setOnClickListener { action() }
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, dp(10), 0, 0) }
+        }
+    }
+
+    private fun updatePermissionGate(forceToast: Boolean = false) {
+        if (!::permissionGate.isInitialized) return
+
+        val batteryOk = isBatteryOptimizationDisabled()
+        val notificationOk = isNotificationPermissionGranted()
+        val ready = batteryOk && notificationOk
+
+        batteryStatusText.text = if (batteryOk) "✅ Battery Optimization: Unrestricted" else "❌ Battery Optimization: belum Unrestricted"
+        notificationStatusText.text = if (notificationOk) "✅ Notifikasi: aktif" else "❌ Notifikasi: belum aktif"
+        scannerStatusText.text = if (ready) "✅ Scanner: siap jalan di background" else "⛔ Scanner: ditahan sampai izin lengkap"
+
+        permissionGate.visibility = if (ready) View.GONE else View.VISIBLE
+        swipeRefreshLayout.isEnabled = ready
+
+        if (forceToast) {
+            Toast.makeText(this, if (ready) "Izin sudah lengkap." else "Masih ada izin yang belum aktif.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isNotificationPermissionGranted(): Boolean {
+        return if (Build.VERSION.SDK_INT >= 33) {
+            checkSelfPermission("android.permission.POST_NOTIFICATIONS") == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
         }
     }
 
@@ -202,38 +333,46 @@ class MainActivity : Activity() {
         return pm.isIgnoringBatteryOptimizations(packageName)
     }
 
-    private fun requestDisableBatteryOptimization(blockScanner: Boolean) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
-        if (isBatteryOptimizationDisabled()) return
+    private fun hasRequiredPermissions(): Boolean {
+        return isBatteryOptimizationDisabled() && isNotificationPermissionGranted()
+    }
 
-        runOnUiThread {
-            AlertDialog.Builder(this)
-                .setTitle("Wajib matikan Battery Optimization")
-                .setMessage("Amy FX perlu mode Unrestricted / Jangan dibatasi agar scanner dan notifikasi tetap hidup saat aplikasi diminimize. Scanner tidak akan dijalankan sebelum izin ini diaktifkan.")
-                .setCancelable(!blockScanner)
-                .setPositiveButton("Buka Pengaturan") { _, _ -> openBatteryOptimizationRequest() }
-                .setNegativeButton("Nanti", null)
-                .show()
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33 && !isNotificationPermissionGranted()) {
+            requestPermissions(arrayOf("android.permission.POST_NOTIFICATIONS"), NOTIFICATION_REQUEST_CODE)
+        } else {
+            updatePermissionGate(true)
         }
     }
 
     private fun openBatteryOptimizationRequest() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            updatePermissionGate(true)
+            return
+        }
         try {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
                 data = Uri.parse("package:$packageName")
             }
             startActivity(intent)
         } catch (e: Exception) {
-            try {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:$packageName")
-                }
-                startActivity(intent)
-            } catch (ex: Exception) {
-                Toast.makeText(this, "Buka Settings > Battery > Amy FX > Unrestricted", Toast.LENGTH_LONG).show()
-            }
+            openAppSettings()
         }
+    }
+
+    private fun openAppSettings() {
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Buka Settings > Apps > Amy FX", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * resources.displayMetrics.density).toInt()
     }
 
     override fun onBackPressed() {
@@ -264,9 +403,7 @@ class MainActivity : Activity() {
         }
     }
 
-    // JS Interface to save base64 blobs
     inner class WebAppInterface(private val mContext: Context) {
-        
         @JavascriptInterface
         fun showAppToast(message: String) {
             (mContext as Activity).runOnUiThread {
@@ -292,10 +429,9 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun startBackgroundScanner(apiKey: String?, bsl: String?, ssl: String?) {
             try {
-                if (!this@MainActivity.isBatteryOptimizationDisabled()) {
+                if (!this@MainActivity.hasRequiredPermissions()) {
                     (mContext as Activity).runOnUiThread {
-                        Toast.makeText(mContext, "Matikan Battery Optimization dulu agar scanner tidak mati.", Toast.LENGTH_LONG).show()
-                        this@MainActivity.requestDisableBatteryOptimization(true)
+                        this@MainActivity.updatePermissionGate(true)
                     }
                     return
                 }
@@ -329,7 +465,6 @@ class MainActivity : Activity() {
             }
         }
 
-
         @JavascriptInterface
         fun showNotification(title: String, message: String) {
             showNotificationWithUrl(title, message, null)
@@ -344,7 +479,6 @@ class MainActivity : Activity() {
                         putExtra("target_url", url)
                     }
                 }
-                // Use a unique request code so intents aren't merged
                 val requestCode = System.currentTimeMillis().toInt()
                 val pendingIntent = PendingIntent.getActivity(
                     mContext, requestCode, intent,
@@ -363,6 +497,7 @@ class MainActivity : Activity() {
                     .setSmallIcon(android.R.drawable.ic_dialog_alert)
                     .setContentTitle(title)
                     .setContentText(message)
+                    .setStyle(Notification.BigTextStyle().bigText(message))
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
@@ -422,16 +557,16 @@ class MainActivity : Activity() {
             try {
                 val cleanBase64 = base64Data.replaceFirst("^data:.*?;base64,".toRegex(), "")
                 val fileAsBytes = Base64.decode(cleanBase64, 0)
-                
+
                 val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 if (!downloadsDir.exists()) downloadsDir.mkdirs()
-                
+
                 val file = File(downloadsDir, filename)
                 val os = FileOutputStream(file, false)
                 os.write(fileAsBytes)
                 os.flush()
                 os.close()
-                
+
                 (mContext as Activity).runOnUiThread {
                     Toast.makeText(mContext, "File tersimpan di folder Download", Toast.LENGTH_LONG).show()
                 }
