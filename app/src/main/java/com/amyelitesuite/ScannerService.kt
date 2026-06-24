@@ -42,11 +42,18 @@ class ScannerService : Service() {
     private var bslTarget: Double = 0.0
     private var sslTarget: Double = 0.0
     private var finalBias: String = "NEUTRAL"
+    private var htfBias: String = "NEUTRAL"
+    private var htfBiasScore: Int = 0
+    private var htfBiasReason: String = "HTF menunggu data"
+    private var marketPhase: String = "WAIT"
+    private var setupScore: Int = 0
+    private var setupGrade: String = "WAIT"
     private var hasAlertedBsl = false
     private var hasAlertedSsl = false
     private val lastAlertAt = mutableMapOf<String, Long>()
     @Volatile private var lastTickAt = System.currentTimeMillis()
     @Volatile private var lastReconnectAt = 0L
+    @Volatile private var lastHtfScanAt = 0L
 
     private var recentHigh = 0.0
     private var recentLow = 0.0
@@ -59,6 +66,23 @@ class ScannerService : Service() {
         val type: String,
         val low: Double,
         val high: Double
+    )
+
+    data class FrameContext(
+        val tf: String,
+        val bias: String,
+        val phase: String,
+        val pd: String,
+        val score: Int,
+        val high: Double,
+        val low: Double,
+        val eq: Double
+    )
+
+    data class NativeEvent(
+        val key: String,
+        val title: String,
+        val message: String
     )
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -118,6 +142,8 @@ class ScannerService : Service() {
                 val rows = dataAgent.bootstrap("XAU/USD", "M5", 300)
                 if (rows.size >= 20) {
                     buildContext(rows, rows.last().close)
+                    updateHtfBias(rows, rows.last().close, force = true)
+                    updateSetupScore(rows.last().close)
                     startForegroundServiceNotification()
                 }
             } catch (e: Exception) {
@@ -135,11 +161,12 @@ class ScannerService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val text = "Bias: $finalBias | BSL: ${fmt(bslTarget)} | SSL: ${fmt(sslTarget)}"
+        val text = "HTF:$htfBias | Bias:$finalBias | Score:$setupScore | $marketPhase"
         val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, "scanner_channel")
                 .setContentTitle("Amy FX Scanner Active")
                 .setContentText(text)
+                .setStyle(Notification.BigTextStyle().bigText("$text\nBSL: ${fmt(bslTarget)} | SSL: ${fmt(sslTarget)}"))
                 .setSmallIcon(R.drawable.ic_stat_amy_fx)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
@@ -150,6 +177,7 @@ class ScannerService : Service() {
             Notification.Builder(this)
                 .setContentTitle("Amy FX Scanner Active")
                 .setContentText(text)
+                .setStyle(Notification.BigTextStyle().bigText("$text\nBSL: ${fmt(bslTarget)} | SSL: ${fmt(sslTarget)}"))
                 .setSmallIcon(R.drawable.ic_stat_amy_fx)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
@@ -224,6 +252,11 @@ class ScannerService : Service() {
                 val silentTooLong = now - lastTickAt > 120_000L
                 if (silentTooLong) {
                     Log.w("AmyFX", "Watchdog restarting silent WebSocket")
+                    sendDedupedAlert(
+                        "WATCHDOG-${now / 600000L}",
+                        "Scanner Watchdog Aktif",
+                        "Amy FX mendeteksi WebSocket diam lebih dari 2 menit. Koneksi direstart otomatis. Background test masih hidup."
+                    )
                     startForegroundServiceNotification()
                     startWebSocket()
                     lastTickAt = now
@@ -234,16 +267,30 @@ class ScannerService : Service() {
 
     private fun checkTargets(currentPrice: Double, timestamp: Long) {
         val rows = dataAgent.onTick("XAU/USD", "M5", currentPrice, timestamp)
-        if (rows.size >= 20) buildContext(rows, currentPrice)
+        if (rows.size >= 20) {
+            buildContext(rows, currentPrice)
+            updateHtfBias(rows, currentPrice)
+            updateSetupScore(currentPrice)
+            scanNativeEvents(rows, currentPrice).forEach { event ->
+                sendDedupedAlert(event.key, event.title, event.message)
+            }
+            startForegroundServiceNotification()
+        }
 
         val fvg = activeFvg
         val inFvg = fvg != null && currentPrice >= fvg.low && currentPrice <= fvg.high
 
         if (inFvg && fvg != null) {
+            val q = poiQuality("FVG", fvg.type, currentPrice, fvg)
             sendDedupedAlert(
                 "FVG-${fvg.type}-${fmt(fvg.low)}-${fmt(fvg.high)}",
                 "FVG ${fvg.type} Aktif",
-                "Harga XAU/USD ${fmt(currentPrice)} menyentuh FVG ${fvg.type} ${fmt(fvg.low)} - ${fmt(fvg.high)}. OB ditahan sampai reaksi FVG jelas."
+                detailedMessage(
+                    currentPrice,
+                    "${fvg.type} FVG touched",
+                    "${fmt(fvg.low)} - ${fmt(fvg.high)}",
+                    "Quality ${q.first} ${q.second}/100. OB ditahan karena FVG aktif."
+                )
             )
             return
         }
@@ -255,10 +302,16 @@ class ScannerService : Service() {
         }
 
         if (ob != null) {
+            val q = poiQuality("OB", ob.type, currentPrice, ob)
             sendDedupedAlert(
                 "OB-${ob.type}-${fmt(ob.low)}-${fmt(ob.high)}",
                 "OB ${ob.type} Tersentuh",
-                "Harga XAU/USD ${fmt(currentPrice)} masuk OB ${ob.type} ${fmt(ob.low)} - ${fmt(ob.high)}. Final Bias: $finalBias."
+                detailedMessage(
+                    currentPrice,
+                    "${ob.type} OB touched",
+                    "${fmt(ob.low)} - ${fmt(ob.high)}",
+                    "Quality ${q.first} ${q.second}/100. Final Bias: $finalBias."
+                )
             )
         }
 
@@ -267,7 +320,7 @@ class ScannerService : Service() {
             sendDedupedAlert(
                 "BSL-${fmt(bslTarget)}",
                 "BSL Tertembus",
-                "Harga XAU/USD ${fmt(currentPrice)} melewati BSL ${fmt(bslTarget)}. Final Bias: $finalBias."
+                detailedMessage(currentPrice, "BSL tertembus", fmt(bslTarget), "Target atas sudah diambil. Final Bias: $finalBias.")
             )
         }
 
@@ -276,9 +329,190 @@ class ScannerService : Service() {
             sendDedupedAlert(
                 "SSL-${fmt(sslTarget)}",
                 "SSL Tertembus",
-                "Harga XAU/USD ${fmt(currentPrice)} menembus SSL ${fmt(sslTarget)}. Final Bias: $finalBias."
+                detailedMessage(currentPrice, "SSL tertembus", fmt(sslTarget), "Target bawah sudah diambil. Final Bias: $finalBias.")
             )
         }
+    }
+
+    private fun scanNativeEvents(rows: List<CandleStore.Candle>, currentPrice: Double): List<NativeEvent> {
+        val events = mutableListOf<NativeEvent>()
+        if (rows.size < 20) return events
+
+        val latest = rows.last()
+        val a = max(atr(rows), 0.05)
+        val body = abs(latest.close - latest.open)
+        val br = bodyRatio(latest)
+        val trend = inferTrend(rows)
+        val phase = calcMarketPhase(rows, trend, a)
+        marketPhase = phase
+
+        events.add(
+            NativeEvent(
+                "PHASE-$phase-${latest.openTime}",
+                "Market Phase $phase",
+                detailedMessage(currentPrice, "Market Phase $phase", "Trend ${trend.uppercase()}", "HTF Bias: $htfBias. Setup Score: $setupScore/100 ($setupGrade).")
+            )
+        )
+
+        if (body >= a * 1.5 && br >= 0.65) {
+            val dir = if (latest.close > latest.open) "Bullish" else "Bearish"
+            events.add(
+                NativeEvent(
+                    "DISPLACEMENT-$dir-${latest.openTime}",
+                    "$dir Displacement",
+                    detailedMessage(currentPrice, "$dir displacement M5", "Close ${fmt(latest.close)}", "Phase EXPANSION. Body kuat. HTF Bias: $htfBias.")
+                )
+            )
+        }
+
+        if (currentPrice > recentHigh) {
+            val tag = if (trend == "bearish") "MSS" else "BOS"
+            events.add(
+                NativeEvent(
+                    "STRUCT-$tag-BULL-${fmt(recentHigh)}",
+                    "$tag Bullish M5",
+                    detailedMessage(currentPrice, "$tag Bullish M5", fmt(recentHigh), "Resistance/BSL dijebol. HTF Bias: $htfBias. Setup Score: $setupScore/100.")
+                )
+            )
+        }
+
+        if (currentPrice < recentLow) {
+            val tag = if (trend == "bullish") "MSS" else "BOS"
+            events.add(
+                NativeEvent(
+                    "STRUCT-$tag-BEAR-${fmt(recentLow)}",
+                    "$tag Bearish M5",
+                    detailedMessage(currentPrice, "$tag Bearish M5", fmt(recentLow), "Support/SSL dijebol. HTF Bias: $htfBias. Setup Score: $setupScore/100.")
+                )
+            )
+        }
+
+        val pivots = pivotLevels(rows)
+        val buySide = pivots.first.filter { it > latest.close }.minOrNull() ?: rows.takeLast(60).maxOf { it.high }
+        val sellSide = pivots.second.filter { it < latest.close }.maxOrNull() ?: rows.takeLast(60).minOf { it.low }
+        val tol = max(a * 0.10, 0.05)
+        val range = max(latest.high - latest.low, 0.0001)
+        val topWick = (latest.high - max(latest.open, latest.close)) / range
+        val botWick = (kotlin.math.min(latest.open, latest.close) - latest.low) / range
+
+        if (latest.high > buySide + tol && latest.close < buySide && topWick >= 0.30) {
+            events.add(
+                NativeEvent(
+                    "SWEEP-BSL-${latest.openTime}",
+                    "BSL Swept",
+                    detailedMessage(currentPrice, "Buy-side liquidity swept", fmt(buySide), "Harga ambil likuiditas atas lalu close kembali. HTF Bias: $htfBias.")
+                )
+            )
+        }
+
+        if (latest.low < sellSide - tol && latest.close > sellSide && botWick >= 0.30) {
+            events.add(
+                NativeEvent(
+                    "SWEEP-SSL-${latest.openTime}",
+                    "SSL Swept",
+                    detailedMessage(currentPrice, "Sell-side liquidity swept", fmt(sellSide), "Harga ambil likuiditas bawah lalu close kembali. HTF Bias: $htfBias.")
+                )
+            )
+        }
+
+        if (setupScore >= 71) {
+            events.add(
+                NativeEvent(
+                    "SETUP-STRONG-$setupGrade-${latest.openTime}",
+                    "Setup Score $setupScore/100",
+                    detailedMessage(currentPrice, "Setup $setupGrade", "$setupScore/100", "HTF Bias: $htfBias. Final Bias: $finalBias. Phase: $marketPhase.")
+                )
+            )
+        }
+
+        events.add(
+            NativeEvent(
+                "HTF-$htfBias-${htfBiasScore / 10}-${latest.openTime / 900L}",
+                "HTF Bias $htfBias",
+                detailedMessage(currentPrice, "HTF Bias $htfBias", "Score $htfBiasScore", htfBiasReason)
+            )
+        )
+
+        return events
+    }
+
+    private fun updateHtfBias(m5Rows: List<CandleStore.Candle>, price: Double, force: Boolean = false) {
+        val now = System.currentTimeMillis()
+        if (!force && now - lastHtfScanAt < 60_000L) return
+        lastHtfScanAt = now
+
+        val frames = mutableListOf<FrameContext>()
+        val tfs = listOf("D1", "H4", "H1", "M15", "M5")
+        for (tf in tfs) {
+            val rows = if (tf == "M5") m5Rows else dataAgent.latest("XAU/USD", tf, 180)
+            if (rows.size >= 20) frames.add(analyzeFrame(tf, rows, price))
+        }
+
+        if (frames.isEmpty()) return
+
+        val weights = mapOf("D1" to 5, "H4" to 4, "H1" to 3, "M15" to 2, "M5" to 1)
+        var total = 0
+        var weightSum = 0
+        frames.forEach { frame ->
+            val w = weights[frame.tf] ?: 1
+            total += frame.score * w
+            weightSum += w
+        }
+
+        val norm = total.toDouble() / max(weightSum, 1).toDouble()
+        htfBiasScore = (norm * 100.0).toInt()
+        htfBias = when {
+            norm >= 0.35 -> "BULLISH"
+            norm <= -0.35 -> "BEARISH"
+            else -> "NEUTRAL"
+        }
+        htfBiasReason = frames.joinToString(" | ") { "${it.tf}:${it.bias}/${it.phase}/${it.pd}" }
+    }
+
+    private fun updateSetupScore(price: Double) {
+        var score = 30
+        if (htfBias != "NEUTRAL" && htfBias == finalBias) score += 25
+        if (htfBias != "NEUTRAL" && finalBias != "NEUTRAL" && htfBias != finalBias) score -= 20
+        if ((finalBias == "BULLISH" && price < eq) || (finalBias == "BEARISH" && price > eq)) score += 15
+        if (activeFvg != null) score -= 10
+        val obActive = discountOb?.let { price >= it.low && price <= it.high } == true || premiumOb?.let { price >= it.low && price <= it.high } == true
+        if (obActive) score += 15
+        if (marketPhase == "EXPANSION") score += 10
+        if (marketPhase == "RETRACEMENT") score += 8
+        setupScore = score.coerceIn(0, 100)
+        setupGrade = when {
+            setupScore >= 71 -> "KUAT"
+            setupScore >= 41 -> "HATI-HATI"
+            else -> "LEMAH"
+        }
+    }
+
+    private fun analyzeFrame(tf: String, rows: List<CandleStore.Candle>, price: Double): FrameContext {
+        val pivots = pivotLevels(rows)
+        val highs = pivots.first
+        val lows = pivots.second
+        val recentH = if (highs.isNotEmpty()) highs.takeLast(3).maxOrNull() ?: rows.takeLast(60).maxOf { it.high } else rows.takeLast(60).maxOf { it.high }
+        val recentL = if (lows.isNotEmpty()) lows.takeLast(3).minOrNull() ?: rows.takeLast(60).minOf { it.low } else rows.takeLast(60).minOf { it.low }
+        val range = max(recentH - recentL, 0.01)
+        val frameEq = recentL + range / 2.0
+        val pd = when {
+            price > frameEq + range * 0.08 -> "PREMIUM"
+            price < frameEq - range * 0.08 -> "DISCOUNT"
+            else -> "EQ"
+        }
+        val trend = inferTrend(rows)
+        val bias = when (trend) {
+            "bullish" -> "BULLISH"
+            "bearish" -> "BEARISH"
+            else -> "NEUTRAL"
+        }
+        val phase = calcMarketPhase(rows, trend, max(atr(rows), 0.05))
+        val score = when (bias) {
+            "BULLISH" -> 1
+            "BEARISH" -> -1
+            else -> 0
+        }
+        return FrameContext(tf, bias, phase, pd, score, recentH, recentL, frameEq)
     }
 
     private fun buildContext(rows: List<CandleStore.Candle>, price: Double) {
@@ -330,6 +564,8 @@ class ScannerService : Service() {
 
     private fun calculateFinalBias(price: Double, fvg: Zone?): String {
         var score = 0
+        if (htfBias == "BULLISH") score += 2
+        if (htfBias == "BEARISH") score -= 2
         if (price > recentHigh) score += 2
         if (price < recentLow) score -= 2
         if (price < eq) score += 1
@@ -341,6 +577,102 @@ class ScannerService : Service() {
             score <= -2 -> "BEARISH"
             else -> "NEUTRAL"
         }
+    }
+
+    private fun pivotLevels(rows: List<CandleStore.Candle>): Pair<List<Double>, List<Double>> {
+        val highs = mutableListOf<Double>()
+        val lows = mutableListOf<Double>()
+        if (rows.size < 10) return Pair(highs, lows)
+        for (i in 3 until rows.size - 2) {
+            var isHigh = true
+            var isLow = true
+            for (j in 1..3) {
+                if (rows[i - j].high >= rows[i].high) isHigh = false
+                if (rows[i - j].low <= rows[i].low) isLow = false
+            }
+            for (j in 1..2) {
+                if (rows[i + j].high >= rows[i].high) isHigh = false
+                if (rows[i + j].low <= rows[i].low) isLow = false
+            }
+            if (isHigh) highs.add(rows[i].high)
+            if (isLow) lows.add(rows[i].low)
+        }
+        return Pair(highs, lows)
+    }
+
+    private fun inferTrend(rows: List<CandleStore.Candle>): String {
+        val pivots = pivotLevels(rows)
+        val highs = pivots.first
+        val lows = pivots.second
+        val hh = highs.size >= 2 && highs[highs.size - 1] > highs[highs.size - 2]
+        val hl = lows.size >= 2 && lows[lows.size - 1] > lows[lows.size - 2]
+        val lh = highs.size >= 2 && highs[highs.size - 1] < highs[highs.size - 2]
+        val ll = lows.size >= 2 && lows[lows.size - 1] < lows[lows.size - 2]
+        return when {
+            hh && hl -> "bullish"
+            lh && ll -> "bearish"
+            else -> "range"
+        }
+    }
+
+    private fun calcMarketPhase(rows: List<CandleStore.Candle>, trend: String, a: Double): String {
+        val latest = rows.lastOrNull() ?: return "WAIT"
+        val body = abs(latest.close - latest.open)
+        if (body >= a * 1.5 && bodyRatio(latest) >= 0.60) return "EXPANSION"
+        val last = rows.takeLast(60)
+        val hi = last.maxOf { it.high }
+        val lo = last.minOf { it.low }
+        val mid = lo + (hi - lo) / 2.0
+        if (trend == "bullish" && latest.close < mid) return "RETRACEMENT"
+        if (trend == "bearish" && latest.close > mid) return "RETRACEMENT"
+        return if (trend == "range") "RANGE" else "CONTINUATION"
+    }
+
+    private fun atr(rows: List<CandleStore.Candle>): Double {
+        val ranges = rows.takeLast(14).map { it.high - it.low }.filter { it > 0 }
+        return if (ranges.isEmpty()) 0.50 else ranges.sum() / ranges.size
+    }
+
+    private fun bodyRatio(c: CandleStore.Candle): Double {
+        val range = max(c.high - c.low, 0.0001)
+        return abs(c.close - c.open) / range
+    }
+
+    private fun poiQuality(kind: String, type: String, price: Double, zone: Zone): Pair<String, Int> {
+        var score = if (kind == "OB") 58 else 54
+        val bullish = type.contains("Bullish", ignoreCase = true) || type.contains("Discount", ignoreCase = true)
+        val bearish = type.contains("Bearish", ignoreCase = true) || type.contains("Premium", ignoreCase = true)
+        if (bullish && htfBias == "BULLISH") score += 15
+        if (bearish && htfBias == "BEARISH") score += 15
+        if (bullish && price < eq) score += 12
+        if (bearish && price > eq) score += 12
+        if (kind == "OB" && activeFvg != null) score -= 18
+        if (marketPhase == "RETRACEMENT") score += 8
+        val mid = (zone.low + zone.high) / 2.0
+        val width = max(zone.high - zone.low, 0.01)
+        if (abs(price - mid) <= width * 2) score += 6
+        score = score.coerceIn(0, 100)
+        val grade = when {
+            score >= 75 -> "KUAT"
+            score >= 55 -> "SEDANG"
+            else -> "LEMAH"
+        }
+        return Pair(grade, score)
+    }
+
+    private fun detailedMessage(price: Double, event: String, area: String, status: String): String {
+        return """
+XAU/USD ${fmt(price)}
+
+Event: $event
+Area: $area
+HTF Bias: $htfBias ($htfBiasScore)
+Final Bias: $finalBias
+Phase: $marketPhase
+Setup Score: $setupScore/100 ($setupGrade)
+Target: BSL ${fmt(bslTarget)} | SSL ${fmt(sslTarget)}
+Status: $status
+        """.trimIndent()
     }
 
     private fun sendDedupedAlert(key: String, title: String, message: String) {
@@ -365,7 +697,7 @@ class ScannerService : Service() {
         val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, "scanner_channel")
                 .setContentTitle(title)
-                .setContentText(message)
+                .setContentText(message.lines().firstOrNull() ?: message)
                 .setStyle(Notification.BigTextStyle().bigText(message))
                 .setSmallIcon(R.drawable.ic_stat_amy_fx)
                 .setContentIntent(pendingIntent)
@@ -375,7 +707,7 @@ class ScannerService : Service() {
             @Suppress("DEPRECATION")
             Notification.Builder(this)
                 .setContentTitle(title)
-                .setContentText(message)
+                .setContentText(message.lines().firstOrNull() ?: message)
                 .setStyle(Notification.BigTextStyle().bigText(message))
                 .setSmallIcon(R.drawable.ic_stat_amy_fx)
                 .setContentIntent(pendingIntent)
