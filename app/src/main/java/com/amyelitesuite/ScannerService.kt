@@ -13,6 +13,7 @@ import android.os.PowerManager
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -35,6 +36,7 @@ class ScannerService : Service() {
         .build()
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var watchdogJob: Job? = null
     private lateinit var dataAgent: MarketDataSyncAgent
     private var apiKey: String? = null
     private var bslTarget: Double = 0.0
@@ -43,6 +45,8 @@ class ScannerService : Service() {
     private var hasAlertedBsl = false
     private var hasAlertedSsl = false
     private val lastAlertAt = mutableMapOf<String, Long>()
+    @Volatile private var lastTickAt = System.currentTimeMillis()
+    @Volatile private var lastReconnectAt = 0L
 
     private var recentHigh = 0.0
     private var recentLow = 0.0
@@ -103,6 +107,7 @@ class ScannerService : Service() {
         startForegroundServiceNotification()
         bootstrapContext()
         startWebSocket()
+        startWatchdog()
 
         return START_STICKY
     }
@@ -137,6 +142,8 @@ class ScannerService : Service() {
                 .setContentText(text)
                 .setSmallIcon(R.drawable.ic_stat_amy_fx)
                 .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .build()
         } else {
             @Suppress("DEPRECATION")
@@ -145,6 +152,8 @@ class ScannerService : Service() {
                 .setContentText(text)
                 .setSmallIcon(R.drawable.ic_stat_amy_fx)
                 .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .build()
         }
 
@@ -164,6 +173,7 @@ class ScannerService : Service() {
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.d("AmyFX", "WebSocket Connected")
+                lastTickAt = System.currentTimeMillis()
                 val subscribeMsg = """{"action": "subscribe", "params": {"symbols": "XAU/USD"}}"""
                 webSocket.send(subscribeMsg)
             }
@@ -172,6 +182,7 @@ class ScannerService : Service() {
                 try {
                     val json = JSONObject(text)
                     if (json.has("price")) {
+                        lastTickAt = System.currentTimeMillis()
                         val currentPrice = json.getDouble("price")
                         val timestamp = json.optLong("timestamp", System.currentTimeMillis() / 1000)
                         checkTargets(currentPrice, timestamp)
@@ -183,16 +194,42 @@ class ScannerService : Service() {
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 Log.e("AmyFX", "WebSocket Error: ${t.message}")
-                serviceScope.launch {
-                    delay(5000)
-                    startWebSocket()
-                }
+                scheduleReconnect("failure")
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 Log.d("AmyFX", "WebSocket Closed: $reason")
+                scheduleReconnect("closed")
             }
         })
+    }
+
+    private fun scheduleReconnect(reason: String) {
+        val now = System.currentTimeMillis()
+        if (now - lastReconnectAt < 5000L) return
+        lastReconnectAt = now
+        serviceScope.launch {
+            delay(5000)
+            Log.d("AmyFX", "Reconnecting WebSocket: $reason")
+            startWebSocket()
+        }
+    }
+
+    private fun startWatchdog() {
+        if (watchdogJob?.isActive == true) return
+        watchdogJob = serviceScope.launch {
+            while (true) {
+                delay(60_000L)
+                val now = System.currentTimeMillis()
+                val silentTooLong = now - lastTickAt > 120_000L
+                if (silentTooLong) {
+                    Log.w("AmyFX", "Watchdog restarting silent WebSocket")
+                    startForegroundServiceNotification()
+                    startWebSocket()
+                    lastTickAt = now
+                }
+            }
+        }
     }
 
     private fun checkTargets(currentPrice: Double, timestamp: Long) {
