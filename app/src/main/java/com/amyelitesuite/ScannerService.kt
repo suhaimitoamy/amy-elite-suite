@@ -66,6 +66,8 @@ class ScannerService : Service() {
     private var hasAlertedBsl = false
     private var hasAlertedSsl = false
     private val lastAlertAt = mutableMapOf<String, Long>()
+    @Volatile private var lastMarketAlertAt = 0L
+    private var lastMarketAlertSignature = ""
     @Volatile private var lastTickAt = System.currentTimeMillis()
     @Volatile private var lastReconnectAt = 0L
     @Volatile private var lastHtfScanAt = 0L
@@ -366,14 +368,6 @@ class ScannerService : Service() {
         val trend = inferTrend(rows)
         val phase = calcMarketPhase(rows, trend, a)
         marketPhase = phase
-
-        events.add(
-            NativeEvent(
-                "PHASE-$phase-${latest.openTime}",
-                contextTitle(),
-                marketReadMessage("Market Phase $phase", "Trend M5 ${trend.uppercase()}.")
-            )
-        )
 
         if (body >= a * 1.5 && br >= 0.65) {
             val dir = if (latest.close > latest.open) "Bullish" else "Bearish"
@@ -1013,7 +1007,14 @@ ${invalidText()}
         val now = System.currentTimeMillis()
         val last = lastAlertAt[key] ?: 0L
         if (now - last < 10 * 60 * 1000L) return
+
+        val signature = title + "|" + message.lineSequence().take(5).joinToString("|")
+        if (signature == lastMarketAlertSignature && now - lastMarketAlertAt < 30 * 60 * 1000L) return
+        if (now - lastMarketAlertAt < 90 * 1000L) return
+
         lastAlertAt[key] = now
+        lastMarketAlertSignature = signature
+        lastMarketAlertAt = now
         sendAlertNotification(title, message)
     }
 
@@ -1049,7 +1050,7 @@ ${invalidText()}
                 .build()
         }
 
-        nm.notify(System.currentTimeMillis().toInt(), notification)
+        nm.notify(2, notification)
     }
 
     private fun stopWebSocket() {
