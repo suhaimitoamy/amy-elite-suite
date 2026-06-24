@@ -3,6 +3,7 @@ package com.amyelitesuite
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DownloadManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -10,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Base64
 import android.app.Notification
 import android.app.NotificationChannel
@@ -79,19 +82,7 @@ class MainActivity : Activity() {
             }
         }
         
-        // Request Ignore Battery Optimization for background execution
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val pm = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                try {
-                    val intent = Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                    intent.data = android.net.Uri.parse("package:$packageName")
-                    startActivity(intent)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
+        requestDisableBatteryOptimization(false)
         
         // Initialize WebView
 
@@ -198,6 +189,53 @@ class MainActivity : Activity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isBatteryOptimizationDisabled()) {
+            Toast.makeText(this, "Amy FX belum Unrestricted. Background scanner bisa mati.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun isBatteryOptimizationDisabled(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        return pm.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun requestDisableBatteryOptimization(blockScanner: Boolean) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        if (isBatteryOptimizationDisabled()) return
+
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle("Wajib matikan Battery Optimization")
+                .setMessage("Amy FX perlu mode Unrestricted / Jangan dibatasi agar scanner dan notifikasi tetap hidup saat aplikasi diminimize. Scanner tidak akan dijalankan sebelum izin ini diaktifkan.")
+                .setCancelable(!blockScanner)
+                .setPositiveButton("Buka Pengaturan") { _, _ -> openBatteryOptimizationRequest() }
+                .setNegativeButton("Nanti", null)
+                .show()
+        }
+    }
+
+    private fun openBatteryOptimizationRequest() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        try {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivity(intent)
+            } catch (ex: Exception) {
+                Toast.makeText(this, "Buka Settings > Battery > Amy FX > Unrestricted", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     override fun onBackPressed() {
         if (::webView.isInitialized && webView.canGoBack()) {
             webView.goBack()
@@ -254,6 +292,14 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun startBackgroundScanner(apiKey: String?, bsl: String?, ssl: String?) {
             try {
+                if (!this@MainActivity.isBatteryOptimizationDisabled()) {
+                    (mContext as Activity).runOnUiThread {
+                        Toast.makeText(mContext, "Matikan Battery Optimization dulu agar scanner tidak mati.", Toast.LENGTH_LONG).show()
+                        this@MainActivity.requestDisableBatteryOptimization(true)
+                    }
+                    return
+                }
+
                 if (!apiKey.isNullOrEmpty() && apiKey != "undefined") {
                     val prefs = mContext.getSharedPreferences("AmyFXPrefs", Context.MODE_PRIVATE)
                     prefs.edit().putString("api_key", apiKey).apply()
