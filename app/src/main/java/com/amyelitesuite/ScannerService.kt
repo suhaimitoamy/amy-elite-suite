@@ -69,6 +69,9 @@ class ScannerService : Service() {
     @Volatile private var lastTickAt = System.currentTimeMillis()
     @Volatile private var lastReconnectAt = 0L
     @Volatile private var lastHtfScanAt = 0L
+    @Volatile private var foregroundStarted = false
+    @Volatile private var lastForegroundUpdateAt = 0L
+    private var lastForegroundSignature = ""
 
     private var recentHigh = 0.0
     private var recentLow = 0.0
@@ -184,6 +187,12 @@ class ScannerService : Service() {
 
         val text = "M15:${contextShort()} | HTF:$htfBias | Score:$setupScore | $setupGrade"
         val big = "$text\nTarget: ${targetText()}\nInvalid: ${invalidText()}"
+        val now = System.currentTimeMillis()
+        val signature = "$text|${targetText()}|${invalidText()}"
+        if (foregroundStarted && signature == lastForegroundSignature && now - lastForegroundUpdateAt < 60_000L) return
+        foregroundStarted = true
+        lastForegroundSignature = signature
+        lastForegroundUpdateAt = now
         val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, "scanner_channel")
                 .setContentTitle("Amy FX Scanner Active")
@@ -279,7 +288,6 @@ class ScannerService : Service() {
                         contextTitle(),
                         marketReadMessage("Scanner watchdog", "WebSocket direstart otomatis")
                     )
-                    startForegroundServiceNotification()
                     startWebSocket()
                     lastTickAt = now
                 }
