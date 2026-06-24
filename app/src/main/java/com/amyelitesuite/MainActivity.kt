@@ -37,6 +37,8 @@ import android.widget.Toast
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.io.File
 import java.io.FileOutputStream
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
@@ -462,6 +464,35 @@ class MainActivity : Activity() {
                 mContext.startService(intent)
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+
+        @JavascriptInterface
+        fun getNativeCandles(symbol: String?, timeframe: String?, limit: String?): String {
+            return try {
+                val safeSymbol = if (symbol.isNullOrBlank() || symbol == "undefined") "XAU/USD" else symbol
+                val safeTimeframe = if (timeframe.isNullOrBlank() || timeframe == "undefined") "M5" else timeframe
+                val safeLimit = limit?.toIntOrNull()?.coerceIn(1, 1000) ?: 300
+                val rows = CandleStore(mContext).getLatest(safeSymbol, safeTimeframe, safeLimit)
+                val arr = JSONArray()
+                rows.forEach { c ->
+                    val obj = JSONObject()
+                    obj.put("symbol", c.symbol)
+                    obj.put("timeframe", c.timeframe)
+                    obj.put("time", c.openTime)
+                    obj.put("open_time", c.openTime)
+                    obj.put("close_time", c.closeTime)
+                    obj.put("open", c.open)
+                    obj.put("high", c.high)
+                    obj.put("low", c.low)
+                    obj.put("close", c.close)
+                    obj.put("tickCount", c.volumeTick)
+                    obj.put("isClosed", c.isClosed)
+                    arr.put(obj)
+                }
+                arr.toString()
+            } catch (e: Exception) {
+                "[]"
             }
         }
 
