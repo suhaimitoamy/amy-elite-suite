@@ -60,3 +60,4 @@ jobs:
           git add app/src/main/java/com/amyelitesuite/ScannerService.kt
           git commit -m "fix: throttle scanner market alert spam" || exit 0
           git push
+# trigger again
