@@ -8,6 +8,8 @@ import org.json.JSONArray
 class SupabaseCandleClient(private val context: Context, private val client: OkHttpClient) {
 
     private val prefs = context.getSharedPreferences("AmyFXPrefs", Context.MODE_PRIVATE)
+    private val defaultUrl = "https://wliecyxzlwhmtftnfnps.supabase.co"
+    private val defaultAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsaWVjeXh6bHdobXRmdG5mbnBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDIyNjgsImV4cCI6MjA5NzgxODI2OH0.PSlhYSFR7_ZiVYLqDDgn6LnYoC_D7GdZybdyZ2i0p6k"
 
     fun isConfigured(): Boolean {
         return getUrl().isNotBlank() && getAnonKey().isNotBlank()
@@ -63,6 +65,6 @@ class SupabaseCandleClient(private val context: Context, private val client: OkH
         }
     }
 
-    private fun getUrl(): String = prefs.getString("supabase_url", "") ?: ""
-    private fun getAnonKey(): String = prefs.getString("supabase_anon_key", "") ?: ""
+    private fun getUrl(): String = prefs.getString("supabase_url", defaultUrl) ?: defaultUrl
+    private fun getAnonKey(): String = prefs.getString("supabase_anon_key", defaultAnonKey) ?: defaultAnonKey
 }
